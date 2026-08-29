@@ -151,3 +151,21 @@ remove Tesseract — the details log records what happened instead.
 | `Install-InvoiceOCR.ps1` | Standalone installer and uninstaller |
 | `assets/invoice-ocr.ico` | Icon for the setup, shortcuts and Programs and Features |
 | `payload/` | Created by the build: the Tesseract setup and language files |
+
+## Licence
+
+Both installers copy `LICENSE`, `NOTICE` and `THIRD-PARTY-NOTICES.md` from the
+project root into the install directory, as `LICENSE.txt`, `NOTICE.txt` and
+`THIRD-PARTY-NOTICES.md`. The uninstallers remove them again.
+
+This is not optional decoration. The jar bundles Apache-2.0 licensed components
+(Tesseract, PDFBox, Commons, Tess4J and others), and Apache 2.0 §4(d) requires
+their NOTICE to accompany any redistribution. Do not drop those files from a
+build you hand to anyone.
+
+Note also that Invoice OCR itself is proprietary — see
+[../LICENSE](../LICENSE). Nothing in this directory grants a recipient the right
+to install or run it; that permission has to come from the author in writing,
+alongside the build. There is deliberately no licence-agreement page in the NSIS
+setup, because the current terms grant no default end-user rights for such a
+page to present.

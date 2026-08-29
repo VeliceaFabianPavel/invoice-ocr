@@ -19,11 +19,19 @@ responsibility is a separate, substitutable piece.
 | **Tests** | 154, all green, no native library required |
 | **Recognition** | 60 / 60 fields across a 10-layout corpus |
 | **Docs** | 11-page user wiki, ~7,600 words |
+| **Licence** | Proprietary — all rights reserved, [see below](#licence) |
 
 > **Using the application rather than working on it?**
 > Start at the user guide: [user-docu/Home.md](user-docu/Home.md), or open
 > [user-docu/html/index.html](user-docu/html/index.html) for the browsable wiki.
 > This README is the developer's view.
+
+> [!IMPORTANT]
+> **This code is not licensed for use.** Invoice OCR is proprietary and all
+> rights are reserved. You may read it; you may not build it, run it, copy it,
+> adapt it or reuse any part of it in your own work without written permission.
+> Developers are explicitly not permitted to use this code at this time — see
+> [Licence](#licence) and [LICENSE](LICENSE).
 
 ---
 
@@ -50,6 +58,7 @@ responsibility is a separate, substitutable piece.
 - [What has actually been verified](#what-has-actually-been-verified)
 - [Known limitations](#known-limitations)
 - [Changelog](#changelog)
+- [Licence](#licence)
 
 ---
 
@@ -794,3 +803,53 @@ existing `invoice-ocr.properties` carries over untouched.
 - Image preprocessing, priority-ordered extraction rules, value normalisation.
 - 11-page user wiki and HTML generator.
 - NSIS and PowerShell installers.
+
+---
+
+## Licence
+
+**Invoice OCR is proprietary software. Copyright © 2026 Fabian Pavel Velicea.
+All rights reserved.**
+
+It is published here to be read — as a portfolio piece and a reference — not to
+be used. Publication is not an open-source release, and the absence of an
+open-source licence is deliberate.
+
+**Developers are not permitted to use this code at this time.** Concretely,
+without prior written permission from the author you may not:
+
+- use it for any purpose, including private, academic or learning use;
+- copy, fork, clone for development or mirror it;
+- compile, build, run, install or deploy it;
+- modify, adapt, port or derive work from it;
+- distribute, publish, sublicense or sell it;
+- fold any part of it into another project, proprietary or open source;
+- submit it, or a derivative of it, as your own work;
+- use it as training data for a machine-learning model.
+
+What you may do is read it, and quote short excerpts with attribution for
+review, commentary, teaching or citation.
+
+The full terms are in [LICENSE](LICENSE); [NOTICE](NOTICE) carries the short
+form that travels with any distributed artifact. If you want permission —
+including academic use, evaluation during hiring, or a future open-source
+release — ask: fabian.velicea@student.unitbv.ro. The author may relicense later,
+and any such change applies only from the date it is published.
+
+### Contributions
+
+Not being accepted under these terms. Anything submitted anyway (patch, pull
+request, issue text) is given to the author irrevocably and free of charge, per
+section 5 of [LICENSE](LICENSE). Do not submit material you cannot give on those
+terms.
+
+### Third-party components
+
+The application depends on third-party software, and the shaded jar and the
+Windows installer redistribute it. Those components stay under their own
+licences — Apache 2.0, BSD, MIT, LGPL 2.1, zlib — and are listed with versions
+in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+Those permissive licences cover *those components only*. They confer no rights
+in the Invoice OCR code itself, which remains governed entirely by
+[LICENSE](LICENSE).

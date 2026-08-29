@@ -1,0 +1,15 @@
+Invoice OCR
+Copyright (c) 2026 Fabian Pavel Velicea. All rights reserved.
+
+This product is proprietary software. It is NOT open source, and no licence to
+use, copy, modify, build, run or distribute it is granted. Developers are not
+permitted to use this code at present. See LICENSE for the full terms.
+
+This product includes third-party software that remains under its own licences,
+listed in THIRD-PARTY-NOTICES.md. Those licences apply only to the third-party
+components named there and grant no rights in the Invoice OCR code itself.
+
+Among the bundled components, this product includes software developed by
+The Apache Software Foundation (https://www.apache.org/), namely Apache
+Tesseract OCR, Apache PDFBox, Apache Commons IO, Apache Commons Logging and
+the Apache PDFBox JBIG2 ImageIO plugin.

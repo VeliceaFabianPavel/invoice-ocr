@@ -1,0 +1,150 @@
+Invoice OCR — Proprietary Software License
+Copyright (c) 2026 Fabian Pavel Velicea. All rights reserved.
+
+===============================================================================
+NO LICENCE IS GRANTED AT THIS TIME
+===============================================================================
+
+This software, its source code, its documentation, its build scripts, its
+installers and every other file in this repository (together, "the Software")
+are the exclusive property of Fabian Pavel Velicea ("the Author") and are
+protected by copyright law and international copyright treaties.
+
+The Software is published for reference and evaluation only. Publication does
+NOT place it in the public domain, does NOT make it open source, and does NOT
+grant anyone a licence of any kind.
+
+-------------------------------------------------------------------------------
+1. What you may do
+-------------------------------------------------------------------------------
+
+Nothing beyond the following:
+
+  a) View and read the Software where the Author has made it visible to you.
+  b) Quote short excerpts for the purposes of review, commentary, teaching or
+     academic citation, with attribution to the Author, to the extent that such
+     use is permitted by applicable copyright law regardless of this licence.
+
+-------------------------------------------------------------------------------
+2. What you may not do
+-------------------------------------------------------------------------------
+
+Without the Author's prior written permission you may NOT:
+
+  a) Use the Software, or any part of it, for any purpose — personal,
+     educational, academic, internal, evaluative, commercial or otherwise.
+  b) Copy, reproduce, download for reuse, fork, clone for development, mirror or
+     otherwise duplicate the Software.
+  c) Compile, build, run, execute, install or deploy the Software.
+  d) Modify, adapt, translate, refactor, port or create derivative works from
+     the Software.
+  e) Distribute, publish, sublicense, sell, rent, lease, lend or otherwise make
+     the Software available to any third party.
+  f) Incorporate the Software, in whole or in part, into any other project,
+     product, library, service or code base, whether proprietary or open source.
+  g) Reverse engineer, decompile or disassemble any compiled artifact of the
+     Software, except to the extent that applicable law expressly forbids this
+     restriction.
+  h) Use the Software, or any part of it, as training data or as input for any
+     machine-learning or generative model.
+  i) Remove, obscure or alter this licence, the copyright notices, or any
+     attribution contained in the Software.
+
+-------------------------------------------------------------------------------
+3. Distributed builds
+-------------------------------------------------------------------------------
+
+The repository contains an installer that produces a distributable build of the
+Software. Building or running such a build is a use of the Software and is
+covered by Section 2; this licence grants no end-user right to install or run
+it.
+
+Where the Author supplies a build to someone — an installer, a jar, or any
+other artifact — the right to install and run it comes from the written
+permission accompanying that build (Section 6), not from this file, and is
+limited to installing and running the unmodified application for its intended
+purpose. Every restriction in Section 2 continues to apply to the Software's
+source code and to the build itself.
+
+-------------------------------------------------------------------------------
+4. Note for developers
+-------------------------------------------------------------------------------
+
+To be unambiguous: developers are NOT permitted to use this code at this time.
+Reading it is allowed; building on it is not. There is no permission to copy it
+into your own project, to compile or run it, to adapt it, to submit it as your
+own work, or to use it as the basis for anything else — not even for private,
+non-commercial, learning or coursework purposes.
+
+That this repository carries no open-source licence is a deliberate choice, not
+an oversight. If a permission you need is not explicitly granted in Section 1,
+assume it is denied.
+
+-------------------------------------------------------------------------------
+5. Contributions
+-------------------------------------------------------------------------------
+
+The Author is not accepting contributions under this licence. Any material
+nevertheless submitted (patch, pull request, issue text, suggestion or other
+content) is provided to the Author irrevocably, free of charge, and the Author
+may use it without restriction and without obligation to the submitter. Do not
+submit material you are not entitled to give on those terms.
+
+-------------------------------------------------------------------------------
+6. Requesting permission
+-------------------------------------------------------------------------------
+
+Permission beyond this licence may be granted, and can only be granted, in
+writing by the Author. Requests — including requests for academic use, for
+evaluation in a hiring process, or for a future open-source licence — should be
+addressed to:
+
+    Fabian Pavel Velicea
+    fabian.velicea@student.unitbv.ro
+
+Any permission granted applies only to the person or organisation named in it,
+only for the purpose stated in it, and only for the period stated in it.
+
+-------------------------------------------------------------------------------
+7. Reservation of rights and future terms
+-------------------------------------------------------------------------------
+
+All rights not expressly granted in Section 1 are reserved by the Author. The
+Author may release the Software under different terms in the future. Until such
+a release is published by the Author, these terms are the only ones in force,
+and a future change of terms does not retroactively authorise any earlier use.
+
+-------------------------------------------------------------------------------
+8. Third-party components
+-------------------------------------------------------------------------------
+
+The Software depends on, and its distributable artifacts bundle, third-party
+components that remain under their own licences. Those licences govern only
+those components; they grant no rights whatsoever in the Author's own code. See
+THIRD-PARTY-NOTICES.md for the list and the applicable terms.
+
+-------------------------------------------------------------------------------
+9. No warranty
+-------------------------------------------------------------------------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, ACCURACY OF OCR OR EXTRACTION RESULTS, AND
+NONINFRINGEMENT.
+
+-------------------------------------------------------------------------------
+10. No liability
+-------------------------------------------------------------------------------
+
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OF OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+-------------------------------------------------------------------------------
+11. Termination
+-------------------------------------------------------------------------------
+
+Any use of the Software outside Section 1, or outside a written permission from
+the Author, is copyright infringement and terminates immediately any permission
+the Author may previously have granted you.

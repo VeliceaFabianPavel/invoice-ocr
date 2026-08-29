@@ -209,7 +209,7 @@ if ($Uninstall) {
         if ($stored.PSObject.Properties['OwnTessdata']) { $ownTessdata = ($stored.OwnTessdata -eq '1') }
     }
 
-    foreach ($file in 'invoice-ocr.jar', 'invoice-ocr.ico', 'invoice-ocr.properties', 'invoice-ocr.properties.bak', 'Install-InvoiceOCR.ps1') {
+    foreach ($file in 'invoice-ocr.jar', 'invoice-ocr.ico', 'invoice-ocr.properties', 'invoice-ocr.properties.bak', 'Install-InvoiceOCR.ps1', 'LICENSE.txt', 'NOTICE.txt', 'THIRD-PARTY-NOTICES.md') {
         $path = Join-Path $installed $file
         if (Test-Path $path) { Remove-Item $path -Force }
     }
@@ -312,6 +312,16 @@ $iconTarget = ''
 if (Test-Path $icon) {
     $iconTarget = Join-Path $InstallDir 'invoice-ocr.ico'
     Copy-Item $icon $iconTarget -Force
+}
+
+# Licence and attributions travel with the build. The Apache-2.0 components
+# bundled in the jar require their NOTICE to accompany any redistribution.
+foreach ($legal in @(
+        @{ Source = '..\LICENSE';                 Target = 'LICENSE.txt' },
+        @{ Source = '..\NOTICE';                  Target = 'NOTICE.txt' },
+        @{ Source = '..\THIRD-PARTY-NOTICES.md';  Target = 'THIRD-PARTY-NOTICES.md' })) {
+    $from = Join-Path $ScriptDir $legal.Source
+    if (Test-Path $from) { Copy-Item $from (Join-Path $InstallDir $legal.Target) -Force }
 }
 
 $handbook = Join-Path $ScriptDir '..\user-docu\html'

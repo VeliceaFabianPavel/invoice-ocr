@@ -63,7 +63,7 @@ VIAddVersionKey "ProductVersion"  "${APP_VERSION}"
 VIAddVersionKey "FileVersion"     "${APP_VERSION}.0"
 VIAddVersionKey "CompanyName"     "${APP_PUBLISHER}"
 VIAddVersionKey "FileDescription" "${APP_NAME} setup"
-VIAddVersionKey "LegalCopyright"  "${APP_PUBLISHER}"
+VIAddVersionKey "LegalCopyright"  "Copyright (C) 2026 Fabian Pavel Velicea. All rights reserved."
 
 ;------------------------------------------------------------------- variables
 
@@ -348,6 +348,12 @@ Section "!${APP_NAME}" SecApp
   File "/oname=${APP_JAR_NAME}" "${APP_JAR}"
   File "assets\invoice-ocr.ico"
 
+  ; Licence and attributions travel with the build. The Apache-2.0 components
+  ; bundled in the jar require their NOTICE to accompany any redistribution.
+  File "/oname=LICENSE.txt" "..\LICENSE"
+  File "/oname=NOTICE.txt" "..\NOTICE"
+  File "/oname=THIRD-PARTY-NOTICES.md" "..\THIRD-PARTY-NOTICES.md"
+
   ; The user handbook travels with the application when it has been generated.
   SetOutPath "$INSTDIR\docs"
   File /nonfatal /r "..\user-docu\html\*.*"
@@ -530,6 +536,9 @@ Section "Uninstall"
 
   Delete "$INSTDIR\${APP_JAR_NAME}"
   Delete "$INSTDIR\invoice-ocr.ico"
+  Delete "$INSTDIR\LICENSE.txt"
+  Delete "$INSTDIR\NOTICE.txt"
+  Delete "$INSTDIR\THIRD-PARTY-NOTICES.md"
   Delete "$INSTDIR\invoice-ocr.properties"
   Delete "$INSTDIR\invoice-ocr.properties.bak"
   Delete "$INSTDIR\uninstall.exe"

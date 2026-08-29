@@ -7,11 +7,40 @@
 
     <groupId>com.invoiceocr</groupId>
     <artifactId>invoice-ocr</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <packaging>jar</packaging>
 
     <name>Invoice OCR</name>
     <description>Desktop application that reads invoice images and extracts their fields.</description>
+
+    <inceptionYear>2026</inceptionYear>
+
+    <!--
+        Proprietary. Not open source: no licence to use, copy, modify, build or
+        distribute this code is granted at present. See LICENSE at the project
+        root. Third-party components bundled by the shade plugin keep their own
+        licences; those are listed in THIRD-PARTY-NOTICES.md.
+    -->
+    <licenses>
+        <license>
+            <name>Proprietary — All Rights Reserved</name>
+            <url>https://github.com/VeliceaFabianPavel/invoice-ocr/blob/main/LICENSE</url>
+            <distribution>manual</distribution>
+            <comments>
+                All rights reserved. No permission is granted to use, copy,
+                modify, build, run or distribute this software. Written
+                permission from the copyright holder is required for any use.
+            </comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Fabian Pavel Velicea</name>
+            <email>fabian.velicea@student.unitbv.ro</email>
+            <roles><role>author</role></roles>
+        </developer>
+    </developers>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
