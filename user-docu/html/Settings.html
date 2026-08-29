@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html" aria-current="page">Settings</a>
+<ul class="sections">
+<li><a href="#where-settings-live">Where settings live</a></li>
+<li><a href="#complete-reference">Complete reference</a></li>
+<li><a href="#recognition-language">Recognition language</a></li>
+<li><a href="#page-segmentation-mode">Page segmentation mode</a></li>
+<li><a href="#engine-mode">Engine mode</a></li>
+<li><a href="#document-formats">Document formats</a></li>
+<li><a href="#image-preparation">Image preparation</a></li>
+<li><a href="#default-export-format">Default export format</a></li>
+<li><a href="#interface-language">Interface language</a></li>
+<li><a href="#worked-examples">Worked examples</a></li>
+</ul>
+</li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="settings">Settings</h1>
+<p>Everything configurable lives in plain-text settings. There is no options dialog in the application — this is deliberate: settings are set once per installation, usually by whoever installs it.</p>
+<hr>
+<h2 id="where-settings-live">Where settings live</h2>
+<p>You can set a value in four places. If the same setting appears in more than one, the <strong>higher row wins</strong>.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>#</th><th>Where</th><th>How you set it</th><th>Use it for</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Command line</td><td><code>java -Docr.language=ron -jar invoice-ocr.jar</code></td><td>Trying something out once</td></tr>
+<tr><td>2</td><td>Environment variable</td><td><code>OCR_LANGUAGE=ron</code></td><td>Rolling out one value across many machines</td></tr>
+<tr><td>3</td><td><strong><code>invoice-ocr.properties</code></strong> next to the jar</td><td>a text file you create</td><td><strong>The normal choice</strong></td></tr>
+<tr><td>4</td><td>Built-in defaults</td><td>inside the application</td><td>Fallback if you set nothing</td></tr>
+</tbody>
+</table>
+</div>
+<p>The recommended approach is a file named exactly <code>invoice-ocr.properties</code> in the same folder as <code>invoice-ocr.jar</code>:</p>
+<pre><code>ocr.tessdata.path=C:/tessdata
+ocr.language=ron+eng
+ui.locale=ro</code></pre>
+<p>Use <strong>forward slashes</strong> in paths, even on Windows. Lines starting with <code>#</code> are comments. Restart the application after changing the file.</p>
+<p>Environment variables use the same name in capitals with underscores: <code>ocr.tessdata.path</code> becomes <code>OCR_TESSDATA_PATH</code>.</p>
+<hr>
+<h2 id="complete-reference">Complete reference</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Setting</th><th>Default</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>ocr.tessdata.path</code></td><td><code>C:/Program Files/Tesseract-OCR/tessdata</code></td><td>Folder holding the <code>*.traineddata</code> language files. <strong>The one setting you must get right.</strong></td></tr>
+<tr><td><code>ocr.language</code></td><td><code>eng</code></td><td>Which language(s) to recognise. Combine with <code>+</code></td></tr>
+<tr><td><code>ocr.pageSegmentationMode</code></td><td><code>3</code></td><td>How the page is divided into text blocks</td></tr>
+<tr><td><code>ocr.engineMode</code></td><td><code>3</code></td><td>Which recognition engine variant to use</td></tr>
+<tr><td><code>document.supportedExtensions</code></td><td><code>png,jpg,jpeg,bmp,tif,tiff,gif</code></td><td>Formats offered in the file dialog</td></tr>
+<tr><td><code>image.preprocessing.enabled</code></td><td><code>true</code></td><td>Whether images are prepared before recognition</td></tr>
+<tr><td><code>image.preprocessing.minimumWidth</code></td><td><code>1000</code></td><td>Images narrower than this are enlarged</td></tr>
+<tr><td><code>export.defaultFormat</code></td><td><code>pdf</code></td><td>Format the export dialog opens on</td></tr>
+<tr><td><code>ui.locale</code></td><td><code>ro</code></td><td>Interface language: <code>ro</code> or <code>en</code></td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="recognition-language">Recognition language</h2>
+<p><code>ocr.language</code> must match the language <strong>printed on your invoices</strong>, and each language needs its file in the tessdata folder.</p>
+<pre><code>ocr.language=ron        # Romanian invoices
+ocr.language=ron+eng    # Romanian invoices containing English terms
+ocr.language=eng        # English invoices</code></pre>
+<p><code>ron+eng</code> is the best default for Romanian business invoices: many carry English product names, and the combination handles both. It is slightly slower than a single language.</p>
+<p>If the file is missing, the application tells you exactly which one it wanted and what it found instead — see <a href="Troubleshooting.html#language-file-not-found">Troubleshooting</a>.</p>
+<hr>
+<h2 id="page-segmentation-mode">Page segmentation mode</h2>
+<p><code>ocr.pageSegmentationMode</code> tells the engine how the page is laid out. Only a few values are worth trying:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Value</th><th>Meaning</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td><code>3</code></td><td>Fully automatic <em>(default)</em></td><td>Almost always</td></tr>
+<tr><td><code>4</code></td><td>A single column of text of varying sizes</td><td>Narrow receipts, simple invoices</td></tr>
+<tr><td><code>6</code></td><td>One uniform block of text</td><td>A cropped region, e.g. just the totals</td></tr>
+<tr><td><code>11</code></td><td>Sparse text, no particular order</td><td>Chaotic layouts where <code>3</code> finds nothing</td></tr>
+</tbody>
+</table>
+</div>
+<p>Change this only after a good scan still gives poor results.</p>
+<hr>
+<h2 id="engine-mode">Engine mode</h2>
+<p><code>ocr.engineMode</code> selects the recognition engine:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Value</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr><td><code>3</code></td><td>Whatever the installation provides <em>(default)</em></td></tr>
+<tr><td><code>1</code></td><td>Neural network only — usually the most accurate on modern data files</td></tr>
+<tr><td><code>0</code></td><td>Legacy engine — only with older language files</td></tr>
+</tbody>
+</table>
+</div>
+<p>Leave it at <code>3</code> unless you have a specific reason.</p>
+<hr>
+<h2 id="document-formats">Document formats</h2>
+<p><code>document.supportedExtensions</code> controls what the file dialog offers and what the application will open. Comma-separated, dots optional:</p>
+<pre><code>document.supportedExtensions=png,tif,tiff</code></pre>
+<p>Restricting the list is a practical way to stop colleagues loading low-quality JPEGs. Adding a format only helps if it is one the image libraries can decode — adding <code>pdf</code> here does <strong>not</strong> enable PDF support.</p>
+<hr>
+<h2 id="image-preparation">Image preparation</h2>
+<pre><code>image.preprocessing.enabled=true
+image.preprocessing.minimumWidth=1000</code></pre>
+<p>With preparation enabled, small images are enlarged (up to 4×) and everything is converted to greyscale before recognition. Setting <code>minimumWidth=0</code> keeps greyscale conversion but disables enlargement. Setting <code>enabled=false</code> passes your image through untouched, which is only sensible if you pre-process scans yourself.</p>
+<hr>
+<h2 id="default-export-format">Default export format</h2>
+<p>Which format the save dialog opens on. You can still pick any other format in the dialog itself; this only decides the starting point.</p>
+<pre><code>export.defaultFormat=pdf     # pdf, txt, md, html, json, xml or csv</code></pre>
+<p>If you always feed a spreadsheet, <code>csv</code> saves a click each time. An unrecognised value falls back to <code>pdf</code> rather than stopping the application, and the mistake is written to the log. See <a href="Exporting.html">Exporting</a> for what each format contains.</p>
+<hr>
+<h2 id="interface-language">Interface language</h2>
+<pre><code>ui.locale=ro    # Romanian (default)
+ui.locale=en    # English</code></pre>
+<p>This changes button labels, panel titles and messages. Any other value falls back to English. It does <strong>not</strong> affect recognition — that is <code>ocr.language</code>.</p>
+<hr>
+<h2 id="worked-examples">Worked examples</h2>
+<p><strong>A Romanian office, Tesseract installed normally</strong></p>
+<pre><code>ocr.language=ron+eng</code></pre>
+<p>Nothing else: the default tessdata path is already correct.</p>
+<p><strong>Language files in a shared folder, English interface</strong></p>
+<pre><code>ocr.tessdata.path=//fileserver/shared/tessdata
+ocr.language=ron+eng
+ui.locale=en</code></pre>
+<p><strong>Testing a setting without committing to it</strong></p>
+<pre><code>java -Docr.pageSegmentationMode=4 -jar invoice-ocr.jar</code></pre>
+<hr>
+<p><strong>See also:</strong> <a href="Installation.html">Installation</a> · <a href="Troubleshooting.html">Troubleshooting</a></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Preparing-Invoices.html"><span>Previous</span>Preparing Invoices</a>
+<a class="next" href="Troubleshooting.html"><span>Next</span>Troubleshooting</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

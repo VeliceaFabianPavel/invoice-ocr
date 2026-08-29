@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Troubleshooting &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html" aria-current="page">Troubleshooting</a>
+<ul class="sections">
+<li><a href="#error-messages">Error messages</a></li>
+<li><a href="#the-application-will-not-start">The application will not start</a></li>
+<li><a href="#poor-or-wrong-results">Poor or wrong results</a></li>
+<li><a href="#performance">Performance</a></li>
+<li><a href="#reporting-a-problem">Reporting a problem</a></li>
+</ul>
+</li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="troubleshooting">Troubleshooting</h1>
+<p>Every failure shows a dialog titled <strong>Eroare</strong> (<em>Error</em>) with a specific message, and the status bar reads <code>Procesare esuata pentru …</code>. Find your message below.</p>
+<hr>
+<h2 id="error-messages">Error messages</h2>
+<h3 id="tessdata-directory-not-found">tessdata directory not found</h3>
+<pre><code>tessdata directory not found: D:\facturi\tessdata</code></pre>
+<p><strong>Cause.</strong> The folder in <code>ocr.tessdata.path</code> does not exist — most often because the language data was never installed, or the path has a typo.</p>
+<p><strong>Fix.</strong> Check that the folder exists and contains files ending in <code>.traineddata</code>. Then either install the language data (<a href="Installation.html#3-install-the-language-data">Installation, step 3</a>) or correct the path (<a href="Settings.html#where-settings-live">Settings</a>). Use forward slashes: <code>C:/tessdata</code>, not <code>C:\tessdata</code>.</p>
+<hr>
+<h3 id="language-file-not-found">Language file not found</h3>
+<pre><code>Language file ron.traineddata not found in C:\tessdata. Available: eng.traineddata</code></pre>
+<p><strong>Cause.</strong> The folder exists, but not the language you asked for. The message lists what <em>is</em> there.</p>
+<p><strong>Fix.</strong> Either download the missing file into that folder, or change <code>ocr.language</code> to one that is available. Note that <code>ron+eng</code> requires <strong>both</strong> files.</p>
+<hr>
+<h3 id="unsupported-document-format">Unsupported document format</h3>
+<pre><code>Unsupported document format: factura.pdf</code></pre>
+<p><strong>Cause.</strong> The file is not one of the accepted picture formats — usually a PDF.</p>
+<p><strong>Fix.</strong> Convert the page to PNG or TIFF at 300 dpi; see <a href="Preparing-Invoices.html#pdf-invoices">PDF invoices</a>.</p>
+<hr>
+<h3 id="file-does-not-exist-or-cannot-be-read">File does not exist or cannot be read</h3>
+<pre><code>File does not exist or cannot be read: N:\scanari\factura.png</code></pre>
+<p><strong>Cause.</strong> The file was moved, renamed or deleted after you selected it, a network drive is disconnected, or you lack permission.</p>
+<p><strong>Fix.</strong> Reopen the dialog and select the file again. For network folders, check the drive is still connected. Copy the file to your local disk to rule out permissions.</p>
+<hr>
+<h3 id="no-image-decoder-available">No image decoder available</h3>
+<pre><code>No image decoder available for: factura.tif</code></pre>
+<p><strong>Cause.</strong> The extension is accepted, but the file's internal format is not — for instance an exotic TIFF compression, or a file that is not really an image despite its name.</p>
+<p><strong>Fix.</strong> Open it in an image viewer and re-save it as PNG.</p>
+<hr>
+<h3 id="ocr-produced-no-text">OCR produced no text</h3>
+<pre><code>OCR produced no text for factura.png</code></pre>
+<p><strong>Cause.</strong> The engine ran and found nothing at all. The page is blank, entirely black, far too low-resolution, or upside down.</p>
+<p><strong>Fix.</strong> Open the image and confirm it really shows a readable invoice the right way up. Then re-scan at 300 dpi — see <a href="Preparing-Invoices.html">Preparing Invoices</a>.</p>
+<hr>
+<h3 id="could-not-write-the-file">Could not write the file</h3>
+<pre><code>Could not write factura-03.pdf: Access is denied</code></pre>
+<p><strong>Cause.</strong> The export could not be saved: the folder is read-only, a network drive is disconnected, the disk is full, or the file is open in another program (a PDF held open by a reader is the usual one).</p>
+<p><strong>Fix.</strong> Close the file if it is open elsewhere, or export to another folder — your Documents folder is always a safe bet. A file that already existed at that name is left untouched when an export fails, so nothing good is lost.</p>
+<hr>
+<h3 id="load-an-invoice-first">Load an invoice first</h3>
+<pre><code>Incarca mai intai o factura: nu exista date de exportat.</code></pre>
+<p><strong>Cause.</strong> <strong>Exporta</strong> was used before an invoice had been read, or after <strong>Goleste</strong> cleared the panels.</p>
+<p><strong>Fix.</strong> Load an invoice; the export button turns active by itself once there is something to save.</p>
+<hr>
+<h3 id="unexpected-error">Unexpected error</h3>
+<pre><code>Eroare neasteptata: ...</code></pre>
+<p><strong>Cause.</strong> Something outside the normal failures — for example the machine ran out of memory on a very large image.</p>
+<p><strong>Fix.</strong> Try a smaller or lower-resolution copy. If it recurs on a specific file, report it — see <a href="#reporting-a-problem">Reporting a problem</a>.</p>
+<hr>
+<h2 id="the-application-will-not-start">The application will not start</h2>
+<p><strong>Nothing happens when I double-click the jar.</strong> Java is either missing or not associated with <code>.jar</code> files. Open a terminal in the folder and run <code>java -jar invoice-ocr.jar</code> — you will see the real reason.</p>
+<p><strong><code>java: command not found</code> or <code>is not recognized</code>.</strong> Java is not installed or not on the system path. See <a href="Installation.html#1-check-that-java-is-installed">Installation, step 1</a>.</p>
+<p><strong><code>UnsupportedClassVersionError</code>.</strong> Your Java is older than 17. Check with <code>java -version</code> and install a newer runtime.</p>
+<p><strong>A window flashes and disappears.</strong> Start it from a terminal so the message stays on screen.</p>
+<hr>
+<h2 id="poor-or-wrong-results">Poor or wrong results</h2>
+<p>The left panel is the diagnosis tool: <strong>it shows exactly what the engine read</strong>. Compare it against the invoice.</p>
+<h3 id="most-fields-are-na">Most fields are N/A</h3>
+<p>The application tries several approaches per field, including values printed below their labels and values with no label at all, so widespread <code>N/A</code> almost always means the text itself is unreadable rather than the layout being unusual.</p>
+<p>Look at the raw panel:</p>
+<ul>
+<li><strong>Is the text garbled or full of strange characters?</strong> The image quality is the problem, and it is by far the most common cause → <a href="Preparing-Invoices.html">Preparing Invoices</a>.</li>
+<li><strong>Is the text correct but the diacritics wrong</strong> (<code>Furnizor</code> read as <code>Fumizor</code>)? The recognition language is wrong → set <code>ocr.language=ron+eng</code>.</li>
+<li><strong>Is the raw panel empty or nearly so?</strong> The page was not read at all: check it is the right way up and scanned at 300 dpi.</li>
+<li><strong>Is the text perfect?</strong> Then the invoice uses labels the application does not know → <a href="Extracted-Fields.html#how-a-field-is-found">How a field is found</a>. Note the supplier, date, fiscal code and total each have a label-free fallback, so a perfect page rarely leaves them empty.</li>
+</ul>
+<h3 id="the-total-is-wrong">The total is wrong</h3>
+<p>Usually the invoice labels its subtotal <code>Total de plata</code> and its real total something else, or an amount was misread. Check the raw panel: if it shows <code>1.190,00</code>, the extraction is right; if it shows <code>1.19O,00</code> (letter O for zero), it is a recognition problem and a better scan fixes it.</p>
+<h3 id="the-date-looks-odd">The date looks odd</h3>
+<p>Dates are shown as <code>dd.MM.yyyy</code>. If a value appears <strong>unchanged</strong> in an unusual form, the application judged it implausible and refused to reformat it — for example a misread <code>32.01.2024</code>, or an ISO-style <code>2024-03-05</code>, which is not the day-first format expected on Romanian invoices.</p>
+<h3 id="only-one-or-two-fields-are-found-on-a-good-scan">Only one or two fields are found on a good scan</h3>
+<p>Check that the whole page was captured, especially the totals block at the bottom. A cut-off footer is the classic cause.</p>
+<hr>
+<h2 id="performance">Performance</h2>
+<p>Recognition normally takes one to three seconds per page.</p>
+<ul>
+<li><strong>Much slower?</strong> Very large images (above ~4000 pixels wide) take longer for no benefit — scan at 300 dpi rather than 1200.</li>
+<li><strong>Using several languages</strong> (<code>ron+eng</code>) is slower than one.</li>
+<li>The <code>tessdata_best</code> language files are noticeably slower than <code>tessdata_fast</code>.</li>
+</ul>
+<hr>
+<h2 id="reporting-a-problem">Reporting a problem</h2>
+<p>When asking for help, include:</p>
+<ol>
+<li>the <strong>exact</strong> error message from the dialog,</li>
+<li>the <strong>whole content of the left panel</strong> (click in it, <code>Ctrl+A</code>, <code>Ctrl+C</code>),</li>
+<li>your <code>invoice-ocr.properties</code>, or the settings you use,</li>
+<li>the invoice image if you are allowed to share it,</li>
+<li>the output of <code>java -version</code>.</li>
+</ol>
+<p>Items 1 and 2 identify most problems on their own.</p>
+<hr>
+<p><strong>See also:</strong> <a href="Preparing-Invoices.html">Preparing Invoices</a> · <a href="Settings.html">Settings</a> · <a href="FAQ.html">FAQ</a></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Settings.html"><span>Previous</span>Settings</a>
+<a class="next" href="FAQ.html"><span>Next</span>Frequently Asked Questions</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

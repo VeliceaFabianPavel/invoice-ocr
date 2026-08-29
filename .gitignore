@@ -1,0 +1,16 @@
+target/
+*.class
+invoice-ocr.properties
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Installer build output
+installer/payload/
+installer/invoice-ocr-setup-*.exe
+
+# Doxygen output (regenerate with: doxygen)
+docu/

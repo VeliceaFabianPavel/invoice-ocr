@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preparing Invoices &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html" aria-current="page">Preparing Invoices</a>
+<ul class="sections">
+<li><a href="#accepted-file-formats">Accepted file formats</a></li>
+<li><a href="#scanning-the-settings-that-matter">Scanning: the settings that matter</a></li>
+<li><a href="#photographing-an-invoice">Photographing an invoice</a></li>
+<li><a href="#what-the-application-does-for-you">What the application does for you</a></li>
+<li><a href="#quick-checklist">Quick checklist</a></li>
+</ul>
+</li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="preparing-invoices">Preparing Invoices</h1>
+<p>Recognition quality is decided before the application ever sees the file. A clean scan gives 6 fields out of 6; a crooked phone photo in a dim office gives two, and no setting will rescue it.</p>
+<p>This page is the highest-value one in this guide when results disappoint.</p>
+<hr>
+<h2 id="accepted-file-formats">Accepted file formats</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Format</th><th>Extensions</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>PNG</td><td><code>.png</code></td><td><strong>Best choice.</strong> Lossless, sharp edges</td></tr>
+<tr><td>TIFF</td><td><code>.tif</code>, <code>.tiff</code></td><td>Excellent; what most scanners produce</td></tr>
+<tr><td>JPEG</td><td><code>.jpg</code>, <code>.jpeg</code></td><td>Fine at high quality; heavy compression blurs characters</td></tr>
+<tr><td>BMP</td><td><code>.bmp</code></td><td>Works, but large files</td></tr>
+<tr><td>GIF</td><td><code>.gif</code></td><td>Works; only suitable for simple black-and-white scans</td></tr>
+</tbody>
+</table>
+</div>
+<p>Files with any other extension are not offered in the dialog. The list is configurable — see <a href="Settings.html#document-formats">Settings</a>.</p>
+<h3 id="pdf-invoices">PDF invoices</h3>
+<p>The application does not open PDFs. Convert the page to an image first:</p>
+<ul>
+<li>open the PDF in your reader and <strong>export or print to PNG/TIFF at 300 dpi</strong>, or</li>
+<li>scan the printed page directly.</li>
+</ul>
+<p>Avoid screenshotting a PDF at screen size — that produces roughly 96 dpi, well below what recognition needs.</p>
+<hr>
+<h2 id="scanning-the-settings-that-matter">Scanning: the settings that matter</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Setting</th><th>Recommended</th><th>Why</th></tr>
+</thead>
+<tbody>
+<tr><td>Resolution</td><td><strong>300 dpi</strong></td><td>The single most important setting. 150 dpi loses thin digits; above 600 dpi only costs time</td></tr>
+<tr><td>Colour mode</td><td>Greyscale or black-and-white</td><td>Colour adds nothing; the application converts to grey anyway</td></tr>
+<tr><td>Format</td><td>PNG or TIFF</td><td>Avoid re-compressing a JPEG repeatedly</td></tr>
+<tr><td>Straightness</td><td>As straight as you can</td><td>Tilted text is the second most common cause of poor results</td></tr>
+<tr><td>Coverage</td><td>The whole page, edge to edge</td><td>A cut-off footer means a missing total</td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="photographing-an-invoice">Photographing an invoice</h2>
+<p>Sometimes a phone is all you have. In that case:</p>
+<ul>
+<li>Lay the invoice <strong>flat</strong> on a dark, non-reflective surface.</li>
+<li>Shoot <strong>straight down</strong>, not at an angle — perspective distortion badly hurts recognition.</li>
+<li>Use <strong>even, indirect light</strong>. Avoid your own shadow and glossy reflections.</li>
+<li>Fill the frame with the page; do not include the desk.</li>
+<li>Check the photo is <strong>sharp</strong> before loading it. If the text is blurry on your phone, it is unreadable to the application.</li>
+<li>Prefer your phone's <strong>document scan</strong> mode if it has one — it deskews and flattens automatically.</li>
+</ul>
+<hr>
+<h2 id="what-the-application-does-for-you">What the application does for you</h2>
+<p>Before recognition, two automatic corrections are applied:</p>
+<ol>
+<li><strong>Enlargement</strong> — images narrower than 1000 pixels are scaled up (at most 4×), because characters below a certain size cannot be recognised at all.</li>
+<li><strong>Greyscale conversion</strong> — colour is removed, which makes the text/background separation more reliable.</li>
+</ol>
+<p>Both are on by default and can be turned off in <a href="Settings.html#image-preparation">Settings</a>, though there is rarely a reason to.</p>
+<p>Note what this does <strong>not</strong> include: the application does not straighten a tilted page, remove shadows or sharpen a blurred photo. Those must be right before you load the file.</p>
+<hr>
+<h2 id="quick-checklist">Quick checklist</h2>
+<p>Before blaming the application, confirm:</p>
+<ul class="check">
+<li>The image is at least ~1000 pixels wide (a 300 dpi A4 scan is ~2480).</li>
+<li>Text is sharp when you zoom to 100 % in an image viewer.</li>
+<li>The page is straight, not rotated or upside down.</li>
+<li>The whole invoice is visible, including the totals block.</li>
+<li>There are no large shadows or glare spots across the text.</li>
+<li>The recognition language matches the invoice — <a href="Settings.html#recognition-language"><code>ocr.language</code></a>.</li>
+</ul>
+<p>If all six hold and results are still poor, the left-hand raw panel will show you what the engine actually saw, and <a href="Troubleshooting.html#poor-or-wrong-results">Troubleshooting</a> covers what to change next.</p>
+<hr>
+<p><strong>See also:</strong> <a href="Settings.html">Settings</a> · <a href="Troubleshooting.html">Troubleshooting</a></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Exporting.html"><span>Previous</span>Exporting</a>
+<a class="next" href="Settings.html"><span>Next</span>Settings</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installation &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html" aria-current="page">Installation</a>
+<ul class="sections">
+<li><a href="#1-check-that-java-is-installed">1. Check that Java is installed</a></li>
+<li><a href="#2-get-the-application">2. Get the application</a></li>
+<li><a href="#3-install-the-language-data">3. Install the language data</a></li>
+<li><a href="#4-point-the-application-at-the-folder">4. Point the application at the folder</a></li>
+<li><a href="#5-start-it">5. Start it</a></li>
+<li><a href="#optional-a-desktop-shortcut">Optional: a desktop shortcut</a></li>
+<li><a href="#other-operating-systems">Other operating systems</a></li>
+</ul>
+</li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="installation">Installation</h1>
+<p>Three things have to be in place: <strong>Java</strong>, the <strong>application</strong>, and the <strong>language data</strong> the recognition engine needs. The third one is the step people miss, and it is the one that produces the most support questions.</p>
+<hr>
+<h2 id="1-check-that-java-is-installed">1. Check that Java is installed</h2>
+<p>Invoice OCR needs <strong>Java 17 or newer</strong>. Open a terminal (Windows: press <code>Win</code>, type <code>cmd</code>, press Enter) and run:</p>
+<pre><code>java -version</code></pre>
+<p>You should see a version of 17 or higher, for example <code>openjdk version "21.0.9"</code>.</p>
+<p>If the command is not recognised, install a Java runtime — for example <a href="https://adoptium.net">Adoptium Temurin</a> 21 — then close and reopen the terminal and check again.</p>
+<hr>
+<h2 id="2-get-the-application">2. Get the application</h2>
+<p><strong>If you were given a ready-made file</strong>, you have <code>invoice-ocr.jar</code>. Put it anywhere you like, for example <code>C:\Programe\InvoiceOCR\</code>.</p>
+<p><strong>If you have the source code</strong>, build it once:</p>
+<pre><code>mvn clean package</code></pre>
+<p>The result is <code>target/invoice-ocr.jar</code>. It already contains everything the application needs except the language data below.</p>
+<hr>
+<h2 id="3-install-the-language-data">3. Install the language data</h2>
+<p>The recognition engine needs a <strong><code>tessdata</code> folder</strong> containing one <code>*.traineddata</code> file per language. Without it the application starts normally but fails the moment you load an invoice, with the message <code>tessdata directory not found</code>.</p>
+<h3 id="option-a-install-tesseract-recommended-on-windows">Option A — install Tesseract (recommended on Windows)</h3>
+<p>Install the Tesseract package, which brings the folder with it:</p>
+<pre><code>winget install UB-Mannheim.TesseractOCR</code></pre>
+<p>During installation, tick the <strong>Romanian</strong> language if you process Romanian invoices. The folder you end up with is:</p>
+<pre><code>C:\Program Files\Tesseract-OCR\tessdata</code></pre>
+<p>That is the path the application expects by default, so if you install here you have nothing further to configure.</p>
+<h3 id="option-b-download-only-the-language-files">Option B — download only the language files</h3>
+<p>If you prefer not to install anything, create a folder such as <code>C:\tessdata</code> and download the files you need into it from the <a href="https://github.com/tesseract-ocr/tessdata_fast">tessdata_fast repository</a>:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Language</th><th>File</th><th>Needed for</th></tr>
+</thead>
+<tbody>
+<tr><td>English</td><td><code>eng.traineddata</code></td><td>English invoices, and a good general fallback</td></tr>
+<tr><td>Romanian</td><td><code>ron.traineddata</code></td><td>Romanian invoices, diacritics included</td></tr>
+</tbody>
+</table>
+</div>
+<p>Each file is a few megabytes. Then tell the application where the folder is — see step 4.</p>
+<blockquote>
+<p><strong>Which variant?</strong> <code>tessdata_fast</code> is quick and accurate enough for clean scans. If results are disappointing on difficult documents, the same files from <code>tessdata_best</code> are slower but more accurate.</p>
+</blockquote>
+<hr>
+<h2 id="4-point-the-application-at-the-folder">4. Point the application at the folder</h2>
+<p>Only necessary if you did <em>not</em> use the default Windows location.</p>
+<p>The simplest way is to create a file named <strong><code>invoice-ocr.properties</code></strong> in the same folder as <code>invoice-ocr.jar</code>, containing:</p>
+<pre><code>ocr.tessdata.path=C:/tessdata
+ocr.language=ron+eng</code></pre>
+<p>Use forward slashes. This file survives application updates, because it sits next to the jar rather than inside it. Two other ways to do the same thing are described in <a href="Settings.html#where-settings-live">Settings</a>.</p>
+<hr>
+<h2 id="5-start-it">5. Start it</h2>
+<p>Double-click <code>invoice-ocr.jar</code>, or run:</p>
+<pre><code>java -jar invoice-ocr.jar</code></pre>
+<p>The window opens with two empty panels and the status <strong>Pregatit</strong> (<em>Ready</em>). That is a successful installation — the language data is only checked when you actually load an invoice.</p>
+<p>To be sure everything works end to end, process one invoice now: <a href="Getting-Started.html">Getting Started</a>.</p>
+<hr>
+<h2 id="optional-a-desktop-shortcut">Optional: a desktop shortcut</h2>
+<p>Right-click your desktop → <strong>New → Shortcut</strong>, and enter:</p>
+<pre><code>javaw -jar "C:\Programe\InvoiceOCR\invoice-ocr.jar"</code></pre>
+<p>Using <code>javaw</code> instead of <code>java</code> starts the window without a black console window behind it.</p>
+<hr>
+<h2 id="other-operating-systems">Other operating systems</h2>
+<p>The application runs on macOS and Linux with the same Java command. Only the tessdata location differs — typically <code>/usr/share/tesseract-ocr/*/tessdata</code> on Linux and <code>/opt/homebrew/share/tessdata</code> on macOS. Set <code>ocr.tessdata.path</code> accordingly.</p>
+<hr>
+<p><strong>Next:</strong> <a href="Getting-Started.html">Getting Started</a> · <strong>If something went wrong:</strong> <a href="Troubleshooting.html">Troubleshooting</a></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="index.html"><span>Previous</span>Home</a>
+<a class="next" href="Getting-Started.html"><span>Next</span>Getting Started</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

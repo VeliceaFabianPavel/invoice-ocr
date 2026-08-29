@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html" aria-current="page">Home</a>
+<ul class="sections">
+<li><a href="#where-to-start">Where to start</a></li>
+<li><a href="#in-one-minute">In one minute</a></li>
+<li><a href="#what-this-application-does-not-do">What this application does not do</a></li>
+</ul>
+</li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="invoice-ocr-user-guide">Invoice OCR — User Guide</h1>
+<p><strong>Invoice OCR</strong> reads a scanned or photographed invoice and pulls out the six fields you would otherwise retype by hand: supplier, invoice number, date, fiscal code, VAT and total due.</p>
+<p>You load an image, wait a second or two, and get two panels side by side: the raw text the recognition engine saw, and a clean summary of the fields it identified.</p>
+<p class="figure"><img src="images/result.png" alt="The main window after processing an invoice" loading="lazy"></p>
+<p>Everything happens on your own computer. No invoice ever leaves the machine.</p>
+<hr>
+<h2 id="where-to-start">Where to start</h2>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>If you…</th><th>Read</th></tr>
+</thead>
+<tbody>
+<tr><td>have not installed it yet</td><td><a href="Installation.html">Installation</a></td></tr>
+<tr><td>want to process your first invoice</td><td><a href="Getting-Started.html">Getting Started</a></td></tr>
+<tr><td>want to know what every button does</td><td><a href="The-Main-Window.html">The Main Window</a></td></tr>
+<tr><td>wonder what the six fields mean</td><td><a href="Extracted-Fields.html">Extracted Fields</a></td></tr>
+<tr><td>want to save the result as PDF, CSV, JSON…</td><td><a href="Exporting.html">Exporting</a></td></tr>
+<tr><td>get poor results</td><td><a href="Preparing-Invoices.html">Preparing Invoices</a></td></tr>
+<tr><td>need Romanian recognition, another language, or other formats</td><td><a href="Settings.html">Settings</a></td></tr>
+<tr><td>hit an error message</td><td><a href="Troubleshooting.html">Troubleshooting</a></td></tr>
+<tr><td>have a quick question</td><td><a href="FAQ.html">FAQ</a></td></tr>
+<tr><td>meet an unfamiliar term</td><td><a href="Glossary.html">Glossary</a></td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="in-one-minute">In one minute</h2>
+<ol>
+<li>Start the application. The window opens with the status <strong>Pregatit</strong> (<em>Ready</em>).</li>
+<li>Click <strong>Incarca factura</strong> (<em>Load invoice</em>).</li>
+<li>Pick a picture of an invoice — PNG, JPG, BMP, TIFF or GIF.</li>
+<li>Wait for the progress bar to stop.</li>
+<li>Read the right-hand panel. The bottom of it tells you how many of the six fields were found, for example <code>Campuri identificate: 6 din 6</code>.</li>
+<li>Click <strong>Exporta</strong> (<em>Export</em>) to save the result as PDF, TXT, Markdown, HTML, JSON, XML or CSV.</li>
+</ol>
+<p>Fields the recognition could not read clearly are shown as <strong>N/A</strong> rather than guessed. If you see several of them, <a href="Preparing-Invoices.html">Preparing Invoices</a> is the page that fixes it most often.</p>
+<hr>
+<h2 id="what-this-application-does-not-do">What this application does not do</h2>
+<p>Knowing the limits up front saves time:</p>
+<ul>
+<li>It reads <strong>one image at a time</strong>. There is no batch or folder mode.</li>
+<li>It does <strong>not open PDF files</strong> directly — convert a page to PNG or TIFF first. (It can <em>write</em> PDF: see <a href="Exporting.html">Exporting</a>.)</li>
+<li>It does <strong>not correct</strong> what the recognition engine reads. If the scan is poor, the result is poor — the raw panel always shows you exactly what was read.</li>
+<li>It reads <strong>totals and headers</strong>, not the individual line items of the table.</li>
+<li>It keeps <strong>no history</strong>. Export what you need before loading the next invoice.</li>
+</ul>
+<hr>
+<p><em>Applies to Invoice OCR 1.1.1. Interface language is Romanian by default; see <a href="Settings.html#interface-language">Settings</a> to switch to English.</em></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<span></span>
+<a class="next" href="Installation.html"><span>Next</span>Installation</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

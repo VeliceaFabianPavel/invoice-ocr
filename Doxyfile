@@ -1,0 +1,134 @@
+# Doxygen configuration for Invoice OCR.
+#
+# Only the settings that differ from Doxygen's defaults are listed, so this file
+# stays readable; everything else keeps its built-in value.
+#
+#   doxygen            (from the project root)
+#
+# Output lands in docu/html/index.html.
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+
+PROJECT_NAME           = "Invoice OCR"
+PROJECT_NUMBER         = 1.1.1
+PROJECT_BRIEF          = "Reads an invoice image, extracts its fields, exports them"
+OUTPUT_DIRECTORY       = docu
+OUTPUT_LANGUAGE        = English
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+
+# The README becomes the front page, so the generated site opens on the same
+# overview a reader gets on the repository.
+INPUT                  = README.md \
+                         src/main/java
+USE_MDFILE_AS_MAINPAGE = README.md
+
+# Test sources are deliberately left out: fakes and corpora are not API. To
+# document them too, add "src/test/java" to INPUT above.
+RECURSIVE              = YES
+FILE_PATTERNS          = *.java \
+                         *.md
+INPUT_ENCODING         = UTF-8
+
+#---------------------------------------------------------------------------
+# Java specifics
+#---------------------------------------------------------------------------
+
+OPTIMIZE_OUTPUT_JAVA   = YES
+JAVADOC_AUTOBRIEF      = YES
+MARKDOWN_SUPPORT       = YES
+BUILTIN_STL_SUPPORT    = NO
+
+# Heading anchors the GitHub way, so the README's own table of contents
+# ("[Quick start](#quick-start)") resolves here exactly as it does on GitHub.
+# With the default DOXYGEN style those anchors are autotoc_md0, autotoc_md1, ...
+# and every TOC entry is reported as an unresolvable \ref.
+MARKDOWN_ID_STYLE      = GITHUB
+
+# Document everything, including package-private and private members: this is an
+# internal reference, not a published API surface.
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_PACKAGE        = YES
+EXTRACT_LOCAL_CLASSES  = YES
+
+# Members are documented where it matters; do not nag about the rest.
+WARN_IF_UNDOCUMENTED   = NO
+WARN_NO_PARAMDOC       = NO
+
+#---------------------------------------------------------------------------
+# Output formats
+#---------------------------------------------------------------------------
+
+GENERATE_HTML          = YES
+
+# DocBook, LaTeX and man are off on purpose.
+#
+# DocBook is not merely unused here, it is broken in this combination: with
+# graphs enabled, Doxygen 1.18 asks dot to write "<name>.png" and then tries to
+# rename "<name>.dot.png" to it. That file does not exist, so every single graph
+# fails with "Failed to rename ...", several hundred errors in one run, and the
+# DocBook output ends up with no images at all. Leaving these off removes the
+# entire error class; the HTML output is unaffected and keeps its graphs.
+GENERATE_DOCBOOK       = NO
+GENERATE_LATEX         = NO
+GENERATE_MAN           = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES
+FULL_SIDEBAR           = NO
+DISABLE_INDEX          = NO
+HTML_COLORSTYLE        = LIGHT
+SEARCHENGINE           = YES
+
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+
+#---------------------------------------------------------------------------
+# Diagrams
+#---------------------------------------------------------------------------
+
+HAVE_DOT               = YES
+
+# Graphviz must be reachable. It is found on PATH when installed normally; if
+# graphs come out missing, point this at the folder holding dot.exe, for example
+# DOT_PATH = "C:/Program Files/Graphviz/bin"
+DOT_PATH               =
+
+# SVG rather than PNG: the graphs scale, stay searchable, and avoid the
+# raster-file renaming that DocBook trips over.
+DOT_IMAGE_FORMAT       = svg
+INTERACTIVE_SVG        = YES
+
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = NO
+CALL_GRAPH             = YES
+CALLER_GRAPH           = YES
+DIRECTORY_GRAPH        = YES
+
+# The composition root pulls in more than 50 nodes, which is Doxygen's default
+# ceiling: below 100 its include graph is silently dropped with a warning.
+DOT_GRAPH_MAX_NODES    = 100
+MAX_DOT_GRAPH_DEPTH    = 0
+DOT_CLEANUP            = YES
+
+#---------------------------------------------------------------------------
+# Noise control
+#---------------------------------------------------------------------------
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_DOC_ERROR      = YES
+WARN_LOGFILE           =

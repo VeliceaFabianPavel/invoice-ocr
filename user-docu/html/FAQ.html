@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frequently Asked Questions &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html" aria-current="page">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="frequently-asked-questions">Frequently Asked Questions</h1>
+<hr>
+<h3 id="are-my-invoices-sent-anywhere">Are my invoices sent anywhere?</h3>
+<p><strong>No.</strong> Recognition runs entirely on your computer. The application makes no network connections and needs no internet access after installation. Invoices never leave the machine.</p>
+<h3 id="does-it-save-my-invoices-or-keep-a-history">Does it save my invoices, or keep a history?</h3>
+<p>Only when you ask it to. Nothing is written until you click <strong>Exporta</strong> and choose a file; there is no history, no database and no cache. Close the window and nothing remains, so export what you need before loading the next invoice.</p>
+<h3 id="can-it-read-pdf-invoices">Can it read PDF invoices?</h3>
+<p>Not directly. Convert the page to PNG or TIFF at 300 dpi first — see <a href="Preparing-Invoices.html#pdf-invoices">PDF invoices</a>.</p>
+<h3 id="can-it-process-a-whole-folder-at-once">Can it process a whole folder at once?</h3>
+<p>No. It handles one image per run. For a batch, load them one after another; the file dialog reopens in the last folder used, so each additional invoice is two clicks.</p>
+<h3 id="can-i-export-to-excel-or-csv">Can I export to Excel or CSV?</h3>
+<p>Yes. Click <strong>Exporta</strong> and choose <strong>CSV spreadsheet</strong>. The header row is the same every time, so exported invoices stack into one sheet: paste each new row under the last. See <a href="Exporting.html">Exporting</a>.</p>
+<h3 id="which-export-format-should-i-use">Which export format should I use?</h3>
+<p>PDF to file or send to a person, CSV for a spreadsheet, JSON or XML to import into another program, TXT or Markdown to paste into notes or an e-mail. The <a href="Exporting.html">Exporting</a> page has a table comparing all seven.</p>
+<h3 id="why-are-the-romanian-letters-wrong-in-my-pdf">Why are the Romanian letters wrong in my PDF?</h3>
+<p>PDF's built-in fonts cannot show <code>ă</code>, <code>ș</code> and <code>ț</code>, so those become <code>a</code>, <code>s</code> and <code>t</code> in PDF exports only. Every other format keeps them exactly as recognised.</p>
+<h3 id="can-i-correct-a-value-in-the-panel">Can I correct a value in the panel?</h3>
+<p>No, both panels are read-only, on purpose: what you copy — or export — is always exactly what the application read. Correct values afterwards in your own system.</p>
+<h3 id="why-is-the-total-shown-as-119000-and-not-119000">Why is the total shown as <code>1190.00</code> and not <code>1.190,00</code>?</h3>
+<p>Amounts are normalised to a single format — dot for decimals, no thousands separator — so results are consistent across invoices and paste cleanly into spreadsheets and accounting imports. The original form is always visible in the left panel.</p>
+<h3 id="why-does-a-field-show-na-when-i-can-clearly-read-it-on-the-invoice">Why does a field show N/A when I can clearly read it on the invoice?</h3>
+<p>You are reading the invoice; the application reads the recognition output. Compare with the left panel — the value is usually garbled there. If the raw text is perfect, the invoice uses a label the application does not know, listed in <a href="Extracted-Fields.html#which-labels-are-recognised">Extracted Fields</a>.</p>
+<h3 id="can-it-handle-invoices-in-other-languages">Can it handle invoices in other languages?</h3>
+<p>Yes, for recognition: install the matching <code>*.traineddata</code> file and set <code>ocr.language</code>. The <strong>field labels</strong> it searches for, however, are Romanian and English, so a German invoice will be transcribed correctly but its fields may not be identified.</p>
+<h3 id="can-i-add-a-seventh-field-such-as-the-due-date">Can I add a seventh field, such as the due date?</h3>
+<p>Not through settings — it requires a small change in the application itself. The developer documentation in the project's <code>README.md</code> describes exactly what to add.</p>
+<h3 id="does-it-work-offline">Does it work offline?</h3>
+<p>Yes, completely. Only the initial download of the language files needs internet.</p>
+<h3 id="does-it-need-tesseract-installed-separately">Does it need Tesseract installed separately?</h3>
+<p>Only the <strong>language data</strong> (<code>*.traineddata</code>). The recognition engine itself is bundled with the application. Installing Tesseract is simply the most convenient way to obtain that data on Windows — see <a href="Installation.html#3-install-the-language-data">Installation</a>.</p>
+<h3 id="which-invoice-layouts-does-it-work-best-with">Which invoice layouts does it work best with?</h3>
+<p>Machine-printed invoices with clear labels — <code>Furnizor:</code>, <code>CUI:</code>, <code>Total de plata</code> — scanned at 300 dpi. Handwritten invoices, stamps over text, and photographs at an angle all give markedly worse results.</p>
+<h3 id="can-several-people-use-it-at-once">Can several people use it at once?</h3>
+<p>Yes; it runs independently on each machine and shares nothing. A <code>tessdata</code> folder on a network share can be used by all of them — set <code>ocr.tessdata.path</code> to the share.</p>
+<h3 id="how-much-does-recognition-cost">How much does recognition cost?</h3>
+<p>Nothing. There is no subscription and no per-page charge; all processing is local.</p>
+<hr>
+<p><strong>See also:</strong> <a href="Troubleshooting.html">Troubleshooting</a> · <a href="Glossary.html">Glossary</a></p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Troubleshooting.html"><span>Previous</span>Troubleshooting</a>
+<a class="next" href="Glossary.html"><span>Next</span>Glossary</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>
