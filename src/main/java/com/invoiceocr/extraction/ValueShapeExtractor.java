@@ -1,5 +1,6 @@
 package com.invoiceocr.extraction;
 
+import com.invoiceocr.domain.FieldConfidence;
 import com.invoiceocr.extraction.text.Amounts;
 import com.invoiceocr.extraction.text.SearchText;
 import com.invoiceocr.extraction.text.TextRegion;
@@ -20,7 +21,9 @@ import java.util.Optional;
  * beats reporting nothing.</p>
  *
  * <p>Because these strategies guess, they are registered last in a rule, after
- * every labelled strategy has had its turn.</p>
+ * every labelled strategy has had its turn, and they are rated accordingly: a
+ * shape match is {@code LOOSE}, and picking the largest of several candidates
+ * is {@code INFERRED}.</p>
  */
 public final class ValueShapeExtractor implements FieldExtractor {
 
@@ -30,7 +33,9 @@ public final class ValueShapeExtractor implements FieldExtractor {
         /** The last one printed, which on a totals block is usually the final figure. */
         LAST,
         /** The numerically largest, for finding a total among line items. */
-        LARGEST
+        LARGEST,
+        /** The numerically smallest, for picking the VAT out of a totals block. */
+        SMALLEST
     }
 
     private final ValuePattern value;
@@ -45,23 +50,47 @@ public final class ValueShapeExtractor implements FieldExtractor {
         return new ValueShapeExtractor(value, Selection.FIRST);
     }
 
+    public static ValueShapeExtractor last(ValuePattern value) {
+        return new ValueShapeExtractor(value, Selection.LAST);
+    }
+
     public static ValueShapeExtractor largest(ValuePattern value) {
         return new ValueShapeExtractor(value, Selection.LARGEST);
     }
 
+    public static ValueShapeExtractor smallest(ValuePattern value) {
+        return new ValueShapeExtractor(value, Selection.SMALLEST);
+    }
+
     @Override
-    public Optional<String> extract(SearchText text, TextRegion region) {
+    public Optional<Extraction> extract(SearchText text, TextRegion region) {
         List<ValuePattern.Found> all = value.allIn(text, region);
         if (all.isEmpty()) {
             return Optional.empty();
         }
-        return switch (selection) {
-            case FIRST -> Optional.of(all.get(0).value());
-            case LAST -> Optional.of(all.get(all.size() - 1).value());
-            case LARGEST -> all.stream()
-                    .max(Comparator.comparing(found -> Amounts.toNumber(found.value())
-                            .orElse(BigDecimal.valueOf(Long.MIN_VALUE))))
-                    .map(ValuePattern.Found::value);
+        Optional<ValuePattern.Found> chosen = switch (selection) {
+            case FIRST -> Optional.of(all.get(0));
+            case LAST -> Optional.of(all.get(all.size() - 1));
+            case LARGEST -> all.stream().max(byAmount());
+            case SMALLEST -> all.stream().min(byAmount());
         };
+        return chosen.map(found -> Extraction.of(found.value(), confidence(), name()));
+    }
+
+    /** Unparseable candidates sort to the bottom rather than throwing. */
+    private static Comparator<ValuePattern.Found> byAmount() {
+        return Comparator.comparing(found -> Amounts.toNumber(found.value())
+                .orElse(BigDecimal.valueOf(Long.MIN_VALUE)));
+    }
+
+    private double confidence() {
+        return switch (selection) {
+            case FIRST, LAST -> FieldConfidence.LOOSE;
+            case LARGEST, SMALLEST -> FieldConfidence.INFERRED;
+        };
+    }
+
+    private String name() {
+        return "shape-" + selection.name().toLowerCase(java.util.Locale.ROOT);
     }
 }

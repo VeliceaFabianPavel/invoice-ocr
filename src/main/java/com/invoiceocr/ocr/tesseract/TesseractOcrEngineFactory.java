@@ -3,6 +3,7 @@ package com.invoiceocr.ocr.tesseract;
 import com.invoiceocr.config.OcrSettings;
 import com.invoiceocr.ocr.OcrEngine;
 import com.invoiceocr.ocr.OcrEngineFactory;
+import com.invoiceocr.ocr.OcrOptions;
 import java.util.Objects;
 import java.util.function.Supplier;
 import net.sourceforge.tess4j.ITesseract;
@@ -28,8 +29,9 @@ public final class TesseractOcrEngineFactory implements OcrEngineFactory {
     }
 
     @Override
-    public OcrEngine create() {
+    public OcrEngine create(OcrOptions options) {
+        Objects.requireNonNull(options, "options");
         installation.verify();
-        return new TesseractOcrEngine(instanceSupplier.get(), settings);
+        return new TesseractOcrEngine(instanceSupplier.get(), settings, options);
     }
 }

@@ -46,6 +46,25 @@ public final class MessageKeys {
     public static final String FORMAT_XML = "format.xml";
     public static final String FORMAT_CSV = "format.csv";
 
+    // --- 1.2.0 ---
+
+    /** Appended to a value that was found by a strategy which guesses. */
+    public static final String REPORT_REVIEW_MARK = "report.reviewMark";
+
+    /** Explains the mark, shown only when at least one value carries it. */
+    public static final String REPORT_REVIEW_HINT = "report.reviewHint";
+
+    /** Heading of the goods table, and its column labels. */
+    public static final String REPORT_ITEMS_TITLE = "report.items.title";
+    public static final String REPORT_ITEMS_DESCRIPTION = "report.items.description";
+    public static final String REPORT_ITEMS_QUANTITY = "report.items.quantity";
+    public static final String REPORT_ITEMS_UNIT_PRICE = "report.items.unitPrice";
+    public static final String REPORT_ITEMS_TOTAL = "report.items.total";
+    public static final String REPORT_ITEMS_SUM = "report.items.sum";
+
+    /** Status line variant used when some values want checking. */
+    public static final String STATUS_DONE_WITH_REVIEW = "status.doneWithReview";
+
     public static final String ERROR_TITLE = "error.title";
     public static final String ERROR_UNEXPECTED = "error.unexpected";
     public static final String WARNING_TITLE = "warning.title";

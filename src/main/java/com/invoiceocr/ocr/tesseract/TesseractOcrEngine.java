@@ -5,6 +5,7 @@ import com.invoiceocr.domain.RecognizedText;
 import com.invoiceocr.domain.SourceImage;
 import com.invoiceocr.exception.OcrExecutionException;
 import com.invoiceocr.ocr.OcrEngine;
+import com.invoiceocr.ocr.OcrOptions;
 import java.util.Objects;
 import net.sourceforge.tess4j.ITesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -19,17 +20,23 @@ public final class TesseractOcrEngine implements OcrEngine {
 
     private final ITesseract tesseract;
     private final OcrSettings settings;
+    private final OcrOptions options;
 
     public TesseractOcrEngine(ITesseract tesseract, OcrSettings settings) {
+        this(tesseract, settings, OcrOptions.inherited());
+    }
+
+    public TesseractOcrEngine(ITesseract tesseract, OcrSettings settings, OcrOptions options) {
         this.tesseract = Objects.requireNonNull(tesseract, "tesseract");
         this.settings = Objects.requireNonNull(settings, "settings");
+        this.options = Objects.requireNonNull(options, "options");
         configure();
     }
 
     private void configure() {
         tesseract.setDatapath(settings.tessdataPath().toString());
         tesseract.setLanguage(settings.language());
-        tesseract.setPageSegMode(settings.pageSegmentationMode());
+        tesseract.setPageSegMode(options.pageSegmentationModeOr(settings.pageSegmentationMode()));
         tesseract.setOcrEngineMode(settings.engineMode());
     }
 
@@ -51,6 +58,7 @@ public final class TesseractOcrEngine implements OcrEngine {
 
     @Override
     public String name() {
-        return "Tesseract(" + settings.language() + ")";
+        return "Tesseract(" + settings.language()
+                + ", psm " + options.pageSegmentationModeOr(settings.pageSegmentationMode()) + ")";
     }
 }

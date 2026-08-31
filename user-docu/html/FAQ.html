@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -58,18 +60,28 @@
 <p>You are reading the invoice; the application reads the recognition output. Compare with the left panel — the value is usually garbled there. If the raw text is perfect, the invoice uses a label the application does not know, listed in <a href="Extracted-Fields.html#which-labels-are-recognised">Extracted Fields</a>.</p>
 <h3 id="can-it-handle-invoices-in-other-languages">Can it handle invoices in other languages?</h3>
 <p>Yes, for recognition: install the matching <code>*.traineddata</code> file and set <code>ocr.language</code>. The <strong>field labels</strong> it searches for, however, are Romanian and English, so a German invoice will be transcribed correctly but its fields may not be identified.</p>
-<h3 id="can-i-add-a-seventh-field-such-as-the-due-date">Can I add a seventh field, such as the due date?</h3>
+<h3 id="can-i-add-a-thirteenth-field">Can I add a thirteenth field?</h3>
 <p>Not through settings — it requires a small change in the application itself. The developer documentation in the project's <code>README.md</code> describes exactly what to add.</p>
 <h3 id="does-it-work-offline">Does it work offline?</h3>
 <p>Yes, completely. Only the initial download of the language files needs internet.</p>
 <h3 id="does-it-need-tesseract-installed-separately">Does it need Tesseract installed separately?</h3>
 <p>Only the <strong>language data</strong> (<code>*.traineddata</code>). The recognition engine itself is bundled with the application. Installing Tesseract is simply the most convenient way to obtain that data on Windows — see <a href="Installation.html#3-install-the-language-data">Installation</a>.</p>
 <h3 id="which-invoice-layouts-does-it-work-best-with">Which invoice layouts does it work best with?</h3>
-<p>Machine-printed invoices with clear labels — <code>Furnizor:</code>, <code>CUI:</code>, <code>Total de plata</code> — scanned at 300 dpi. Handwritten invoices, stamps over text, and photographs at an angle all give markedly worse results.</p>
+<p>Machine-printed invoices with clear labels — <code>Furnizor:</code>, <code>CUI:</code>, <code>Total de plata</code> — scanned at 300 dpi. Handwritten invoices and stamps over text still give markedly worse results. Photographs taken at a slight angle are much better handled since version 1.2, which straightens the page before reading it.</p>
 <h3 id="can-several-people-use-it-at-once">Can several people use it at once?</h3>
 <p>Yes; it runs independently on each machine and shares nothing. A <code>tessdata</code> folder on a network share can be used by all of them — set <code>ocr.tessdata.path</code> to the share.</p>
 <h3 id="how-much-does-recognition-cost">How much does recognition cost?</h3>
 <p>Nothing. There is no subscription and no per-page charge; all processing is local.</p>
+<h3 id="what-does-the-beside-a-value-mean">What does the (?) beside a value mean?</h3>
+<p>That the application worked the value out rather than reading it from its own label — a VAT figure derived from the net and the total, say, or the largest amount on a page that never labelled one. It is usually right; it is the one to check against the left panel before you use it. The status bar counts them for you. See <a href="How-It-Reads.html">How It Reads</a>.</p>
+<h3 id="why-is-it-sometimes-slower-than-it-used-to-be">Why is it sometimes slower than it used to be?</h3>
+<p>Because a page it could not read well the first time is now read again, up to three more times, with the picture prepared differently. A clean scan still takes one pass and the same second or two it always did. If you would rather have the old speed unconditionally, set <code>ocr.passes.maximum=1</code> — see <a href="Settings.html#how-many-times-a-page-is-read">Settings</a>.</p>
+<h3 id="it-found-a-vat-amount-that-is-not-printed-on-my-invoice-is-that-safe">It found a VAT amount that is not printed on my invoice. Is that safe?</h3>
+<p>Yes. Every invoice obeys <code>net + VAT = total</code>, so knowing two of the three gives the third exactly. The application never invents a figure — anything it fills in is implied by two figures that were actually printed. Derived values are marked <strong>(?)</strong> so you can see which ones they are.</p>
+<h3 id="why-is-the-bank-account-blank-when-the-invoice-clearly-shows-one">Why is the bank account blank when the invoice clearly shows one?</h3>
+<p>Because it did not pass its checksum. Every IBAN carries one, and an almost-right bank account is worse than none, so the application reports nothing rather than something it cannot verify. Check the left panel: the account is usually there, with one character misread.</p>
+<h3 id="does-it-read-the-product-rows">Does it read the product rows?</h3>
+<p>Yes, since version 1.2, when the table has a recognisable heading row. See <a href="Line-Items.html">Line Items</a>.</p>
 <hr>
 <p><strong>See also:</strong> <a href="Troubleshooting.html">Troubleshooting</a> · <a href="Glossary.html">Glossary</a></p>
 </article>

@@ -23,6 +23,7 @@
 <ul class="sections">
 <li><a href="#where-to-start">Where to start</a></li>
 <li><a href="#in-one-minute">In one minute</a></li>
+<li><a href="#new-in-version-12">New in version 1.2</a></li>
 <li><a href="#what-this-application-does-not-do">What this application does not do</a></li>
 </ul>
 </li>
@@ -30,6 +31,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -41,7 +44,7 @@
 <main id="content">
 <article>
 <h1 id="invoice-ocr-user-guide">Invoice OCR — User Guide</h1>
-<p><strong>Invoice OCR</strong> reads a scanned or photographed invoice and pulls out the six fields you would otherwise retype by hand: supplier, invoice number, date, fiscal code, VAT and total due.</p>
+<p><strong>Invoice OCR</strong> reads a scanned or photographed invoice and pulls out the twelve fields you would otherwise retype by hand — supplier, buyer, invoice number, issue and due dates, fiscal code, trade register, bank account, net amount, VAT, total due and currency — along with the rows of the goods table.</p>
 <p>You load an image, wait a second or two, and get two panels side by side: the raw text the recognition engine saw, and a clean summary of the fields it identified.</p>
 <p class="figure"><img src="images/result.png" alt="The main window after processing an invoice" loading="lazy"></p>
 <p>Everything happens on your own computer. No invoice ever leaves the machine.</p>
@@ -56,7 +59,9 @@
 <tr><td>have not installed it yet</td><td><a href="Installation.html">Installation</a></td></tr>
 <tr><td>want to process your first invoice</td><td><a href="Getting-Started.html">Getting Started</a></td></tr>
 <tr><td>want to know what every button does</td><td><a href="The-Main-Window.html">The Main Window</a></td></tr>
-<tr><td>wonder what the six fields mean</td><td><a href="Extracted-Fields.html">Extracted Fields</a></td></tr>
+<tr><td>wonder what the twelve fields mean</td><td><a href="Extracted-Fields.html">Extracted Fields</a></td></tr>
+<tr><td>want the product rows, not just the totals</td><td><a href="Line-Items.html">Line Items</a></td></tr>
+<tr><td>want to know how much to trust a figure</td><td><a href="How-It-Reads.html">How It Reads</a></td></tr>
 <tr><td>want to save the result as PDF, CSV, JSON…</td><td><a href="Exporting.html">Exporting</a></td></tr>
 <tr><td>get poor results</td><td><a href="Preparing-Invoices.html">Preparing Invoices</a></td></tr>
 <tr><td>need Romanian recognition, another language, or other formats</td><td><a href="Settings.html">Settings</a></td></tr>
@@ -73,10 +78,22 @@
 <li>Click <strong>Incarca factura</strong> (<em>Load invoice</em>).</li>
 <li>Pick a picture of an invoice — PNG, JPG, BMP, TIFF or GIF.</li>
 <li>Wait for the progress bar to stop.</li>
-<li>Read the right-hand panel. The bottom of it tells you how many of the six fields were found, for example <code>Campuri identificate: 6 din 6</code>.</li>
+<li>Read the right-hand panel. The bottom of it tells you how many of the twelve fields were found, for example <code>Campuri identificate: 10 din 12</code>.</li>
+<li>Check anything marked <strong>(?)</strong> — see below.</li>
 <li>Click <strong>Exporta</strong> (<em>Export</em>) to save the result as PDF, TXT, Markdown, HTML, JSON, XML or CSV.</li>
 </ol>
 <p>Fields the recognition could not read clearly are shown as <strong>N/A</strong> rather than guessed. If you see several of them, <a href="Preparing-Invoices.html">Preparing Invoices</a> is the page that fixes it most often.</p>
+<hr>
+<h2 id="new-in-version-12">New in version 1.2</h2>
+<p>The application now reads each page <strong>several times over</strong>, preparing the picture differently each time, and compares the answers — which rescues photographs taken at an angle, pages lit unevenly, and faded receipts. It stops as soon as one reading is good enough, so a clean scan is no slower than before.</p>
+<p>It also <strong>checks</strong> what it read. A fiscal code has a control digit; a bank account has a checksum; a date has to exist in the calendar; and net plus VAT has to equal the total. Where a check fails, the application tries again rather than reporting the first thing it found — and where two figures are known, the third is worked out exactly.</p>
+<p>What you will notice day to day:</p>
+<ul>
+<li><strong>Twelve fields instead of six</strong>, and the rows of the goods table.</li>
+<li><strong>A status line that says what to check</strong>: <em>"10 fields recognised, 2 to check"</em>, with those two marked <strong>(?)</strong> in the report. Everything unmarked was read from its own label.</li>
+<li><strong>Fewer N/As</strong>, particularly for amounts: an invoice that prints only two of the three now yields all three.</li>
+</ul>
+<p><a href="How-It-Reads.html">How It Reads</a> explains all of it.</p>
 <hr>
 <h2 id="what-this-application-does-not-do">What this application does not do</h2>
 <p>Knowing the limits up front saves time:</p>
@@ -84,11 +101,11 @@
 <li>It reads <strong>one image at a time</strong>. There is no batch or folder mode.</li>
 <li>It does <strong>not open PDF files</strong> directly — convert a page to PNG or TIFF first. (It can <em>write</em> PDF: see <a href="Exporting.html">Exporting</a>.)</li>
 <li>It does <strong>not correct</strong> what the recognition engine reads. If the scan is poor, the result is poor — the raw panel always shows you exactly what was read.</li>
-<li>It reads <strong>totals and headers</strong>, not the individual line items of the table.</li>
+<li>The goods table needs a <strong>recognisable heading row</strong>; without one the rows are reported as absent rather than guessed at.</li>
 <li>It keeps <strong>no history</strong>. Export what you need before loading the next invoice.</li>
 </ul>
 <hr>
-<p><em>Applies to Invoice OCR 1.1.1. Interface language is Romanian by default; see <a href="Settings.html#interface-language">Settings</a> to switch to English.</em></p>
+<p><em>Applies to Invoice OCR 1.2.0. Interface language is Romanian by default; see <a href="Settings.html#interface-language">Settings</a> to switch to English.</em></p>
 </article>
 <nav class="pager" aria-label="Pagination">
 <span></span>

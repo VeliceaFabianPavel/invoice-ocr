@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html" aria-current="page">Preparing Invoices</a>
 <ul class="sections">
@@ -98,25 +100,35 @@
 </ul>
 <hr>
 <h2 id="what-the-application-does-for-you">What the application does for you</h2>
-<p>Before recognition, two automatic corrections are applied:</p>
-<ol>
-<li><strong>Enlargement</strong> — images narrower than 1000 pixels are scaled up (at most 4×), because characters below a certain size cannot be recognised at all.</li>
-<li><strong>Greyscale conversion</strong> — colour is removed, which makes the text/background separation more reliable.</li>
-</ol>
-<p>Both are on by default and can be turned off in <a href="Settings.html#image-preparation">Settings</a>, though there is rarely a reason to.</p>
-<p>Note what this does <strong>not</strong> include: the application does not straighten a tilted page, remove shadows or sharpen a blurred photo. Those must be right before you load the file.</p>
+<p>Quite a lot more than it used to. Every reading enlarges small images (at most 4×, because characters below a certain size cannot be recognised at all) and removes colour, which makes the text stand out from the background. Then, if that reading was not good enough, it tries again with the picture prepared differently:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Attempt</th><th>Also does</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>nothing more — enough for a clean scan</td></tr>
+<tr><td>2</td><td><strong>straightens</strong> a tilted page and <strong>stretches the contrast</strong> of a faded one</td></tr>
+<tr><td>3</td><td>converts to <strong>black and white</strong>, judging each part of the page against its own surroundings — which is what rescues uneven lighting</td></tr>
+<tr><td>4</td><td><strong>sharpens</strong> softened characters</td></tr>
+</tbody>
+</table>
+</div>
+<p>So a photograph taken at three degrees, or a page with a desk lamp on one side, is now largely handled for you. See <a href="How-It-Reads.html">How It Reads</a>.</p>
+<p>All of it is on by default and can be turned off in <a href="Settings.html#image-preparation">Settings</a>, though there is rarely a reason to.</p>
+<p>Note what this still does <strong>not</strong> include: the application will not turn a page the right way up, un-blur a photograph that was out of focus, or recover text under a stamp. And straightening handles a tilt of a few degrees, not a page scanned sideways. Everything below still helps.</p>
 <hr>
 <h2 id="quick-checklist">Quick checklist</h2>
 <p>Before blaming the application, confirm:</p>
 <ul class="check">
 <li>The image is at least ~1000 pixels wide (a 300 dpi A4 scan is ~2480).</li>
 <li>Text is sharp when you zoom to 100 % in an image viewer.</li>
-<li>The page is straight, not rotated or upside down.</li>
+<li>The page is the right way up. A few degrees of tilt is corrected for you; a page scanned sideways is not.</li>
 <li>The whole invoice is visible, including the totals block.</li>
 <li>There are no large shadows or glare spots across the text.</li>
 <li>The recognition language matches the invoice — <a href="Settings.html#recognition-language"><code>ocr.language</code></a>.</li>
 </ul>
-<p>If all six hold and results are still poor, the left-hand raw panel will show you what the engine actually saw, and <a href="Troubleshooting.html#poor-or-wrong-results">Troubleshooting</a> covers what to change next.</p>
+<p>If all of these hold and results are still poor, the left-hand raw panel will show you what the engine actually saw, and <a href="Troubleshooting.html#poor-or-wrong-results">Troubleshooting</a> covers what to change next.</p>
 <hr>
 <p><strong>See also:</strong> <a href="Settings.html">Settings</a> · <a href="Troubleshooting.html">Troubleshooting</a></p>
 </article>

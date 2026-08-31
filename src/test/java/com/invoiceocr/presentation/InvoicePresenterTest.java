@@ -55,6 +55,28 @@ class InvoicePresenterTest {
     }
 
     @Test
+    @DisplayName("the status line counts the fields read when none of them are in doubt")
+    void reportsAPlainCount() {
+        presenter(() -> Optional.of(DOCUMENT), path -> sampleData()).onLoadInvoiceRequested();
+
+        assertTrue(view.statuses().stream().anyMatch(status -> status.startsWith("status.done")),
+                view.statuses().toString());
+        assertFalse(view.statuses().stream()
+                        .anyMatch(status -> status.startsWith("status.doneWithReview")),
+                "nothing was guessed, so nothing needs checking");
+    }
+
+    @Test
+    @DisplayName("the status line says how many values want checking when some do")
+    void reportsWhatNeedsChecking() {
+        presenter(() -> Optional.of(DOCUMENT), path -> dataNeedingReview()).onLoadInvoiceRequested();
+
+        assertTrue(view.statuses().stream()
+                        .anyMatch(status -> status.startsWith("status.doneWithReview")),
+                view.statuses().toString());
+    }
+
+    @Test
     @DisplayName("enables exporting only once there is something to export")
     void enablesExportAfterRecognition() {
         presenter(() -> Optional.of(DOCUMENT), path -> sampleData()).onLoadInvoiceRequested();
@@ -204,6 +226,15 @@ class InvoicePresenterTest {
         return InvoiceData.of(
                 RecognizedText.of("Furnizor: ACME SRL"),
                 List.of(ExtractedField.of(InvoiceFields.SUPPLIER, "ACME SRL")));
+    }
+
+    /** The same invoice, with a total that was guessed rather than read. */
+    private static InvoiceData dataNeedingReview() {
+        return InvoiceData.of(
+                RecognizedText.of("Furnizor: ACME SRL"),
+                List.of(ExtractedField.of(InvoiceFields.SUPPLIER, "ACME SRL"),
+                        ExtractedField.of(InvoiceFields.TOTAL_AMOUNT, "1190.00",
+                                com.invoiceocr.domain.FieldConfidence.INFERRED, "shape-largest")));
     }
 
     /** Records what it was asked to export, and can be told to fail. */

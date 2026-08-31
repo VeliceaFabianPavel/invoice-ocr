@@ -136,9 +136,25 @@ public final class InvoicePresenter implements InvoiceViewListener {
         currentDocumentName = baseNameOf(document);
         view.showRawText(data.source().value());
         view.showReport(reportFormatter.format(data));
-        view.showStatus(messages.get(MessageKeys.STATUS_DONE, document.getFileName(), data.recognizedCount()));
+        view.showStatus(statusFor(document, data));
         view.setBusy(false);
         view.setExportEnabled(true);
+    }
+
+    /**
+     * The status line names the count of doubtful values when there are any.
+     *
+     * <p>It is the one place a user looks after a run, and "9 fields recognised,
+     * 2 to check" turns the report from something to read into something to act
+     * on. When nothing needs checking the shorter message is used, so the longer
+     * one keeps meaning what it says.</p>
+     */
+    private String statusFor(Path document, InvoiceData data) {
+        int toReview = data.needingReview().size();
+        return toReview == 0
+                ? messages.get(MessageKeys.STATUS_DONE, document.getFileName(), data.recognizedCount())
+                : messages.get(MessageKeys.STATUS_DONE_WITH_REVIEW,
+                        document.getFileName(), data.recognizedCount(), toReview);
     }
 
     private void onFailed(Path document, Throwable failure) {

@@ -70,7 +70,7 @@ Yes, for recognition: install the matching `*.traineddata` file and set
 English, so a German invoice will be transcribed correctly but its fields may not
 be identified.
 
-### Can I add a seventh field, such as the due date?
+### Can I add a thirteenth field?
 
 Not through settings — it requires a small change in the application itself.
 The developer documentation in the project's `README.md` describes exactly what
@@ -90,8 +90,9 @@ way to obtain that data on Windows — see
 ### Which invoice layouts does it work best with?
 
 Machine-printed invoices with clear labels — `Furnizor:`, `CUI:`,
-`Total de plata` — scanned at 300 dpi. Handwritten invoices, stamps over text,
-and photographs at an angle all give markedly worse results.
+`Total de plata` — scanned at 300 dpi. Handwritten invoices and stamps over text
+still give markedly worse results. Photographs taken at a slight angle are much
+better handled since version 1.2, which straightens the page before reading it.
 
 ### Can several people use it at once?
 
@@ -103,6 +104,41 @@ to the share.
 
 Nothing. There is no subscription and no per-page charge; all processing is
 local.
+
+### What does the (?) beside a value mean?
+
+That the application worked the value out rather than reading it from its own
+label — a VAT figure derived from the net and the total, say, or the largest
+amount on a page that never labelled one. It is usually right; it is the one to
+check against the left panel before you use it. The status bar counts them for
+you. See [How It Reads](How-It-Reads.md).
+
+### Why is it sometimes slower than it used to be?
+
+Because a page it could not read well the first time is now read again, up to
+three more times, with the picture prepared differently. A clean scan still
+takes one pass and the same second or two it always did. If you would rather
+have the old speed unconditionally, set `ocr.passes.maximum=1` — see
+[Settings](Settings.md#how-many-times-a-page-is-read).
+
+### It found a VAT amount that is not printed on my invoice. Is that safe?
+
+Yes. Every invoice obeys `net + VAT = total`, so knowing two of the three gives
+the third exactly. The application never invents a figure — anything it fills in
+is implied by two figures that were actually printed. Derived values are marked
+**(?)** so you can see which ones they are.
+
+### Why is the bank account blank when the invoice clearly shows one?
+
+Because it did not pass its checksum. Every IBAN carries one, and an
+almost-right bank account is worse than none, so the application reports nothing
+rather than something it cannot verify. Check the left panel: the account is
+usually there, with one character misread.
+
+### Does it read the product rows?
+
+Yes, since version 1.2, when the table has a recognisable heading row. See
+[Line Items](Line-Items.md).
 
 ---
 

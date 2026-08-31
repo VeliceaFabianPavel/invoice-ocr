@@ -32,6 +32,8 @@
 <li><a href="#fields-the-application-does-not-extract">Fields the application does not extract</a></li>
 </ul>
 </li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -43,7 +45,7 @@
 <main id="content">
 <article>
 <h1 id="extracted-fields">Extracted Fields</h1>
-<p>The application always looks for the same six fields and always reports all six, in the same order. A field it cannot find is shown as <strong>N/A</strong> rather than guessed.</p>
+<p>The application always looks for the same twelve fields and always reports all twelve, in the same order. A field it cannot find is shown as <strong>N/A</strong> rather than guessed.</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -51,34 +53,46 @@
 </thead>
 <tbody>
 <tr><td>1</td><td>Furnizor</td><td>Supplier</td><td><code>SC EXEMPLU DISTRIBUTIE SRL</code></td></tr>
-<tr><td>2</td><td>Serie / Numar</td><td>Series / Number</td><td><code>FCT-2024/0182</code></td></tr>
-<tr><td>3</td><td>Data emiterii</td><td>Issue date</td><td><code>05.03.2024</code></td></tr>
-<tr><td>4</td><td>CUI / CIF</td><td>Fiscal code</td><td><code>RO12345678</code></td></tr>
-<tr><td>5</td><td>TVA</td><td>VAT</td><td><code>190.00</code></td></tr>
-<tr><td>6</td><td>Total de plata</td><td>Total due</td><td><code>1190.00</code></td></tr>
+<tr><td>2</td><td>Cumparator</td><td>Buyer</td><td><code>SC BETA COMERT SRL</code></td></tr>
+<tr><td>3</td><td>Serie / Numar</td><td>Series / Number</td><td><code>FCT-2024/0182</code></td></tr>
+<tr><td>4</td><td>Data emiterii</td><td>Issue date</td><td><code>05.03.2024</code></td></tr>
+<tr><td>5</td><td>Data scadentei</td><td>Due date</td><td><code>04.04.2024</code></td></tr>
+<tr><td>6</td><td>CUI / CIF</td><td>Fiscal code</td><td><code>RO12345674</code></td></tr>
+<tr><td>7</td><td>Reg. Comertului</td><td>Trade register</td><td><code>J40/1122/2015</code></td></tr>
+<tr><td>8</td><td>Cont bancar (IBAN)</td><td>Bank account</td><td><code>RO49 AAAA 1B31 0075 9384 0000</code></td></tr>
+<tr><td>9</td><td>Total fara TVA</td><td>Net amount</td><td><code>1000.00</code></td></tr>
+<tr><td>10</td><td>TVA</td><td>VAT</td><td><code>190.00</code></td></tr>
+<tr><td>11</td><td>Total de plata</td><td>Total due</td><td><code>1190.00</code></td></tr>
+<tr><td>12</td><td>Moneda</td><td>Currency</td><td><code>RON</code></td></tr>
 </tbody>
 </table>
 </div>
+<p>Six of these — buyer, due date, trade register, IBAN, net amount and currency — are new in version 1.2. Underneath them, the rows of the goods table are read too: see <a href="Line-Items.html">Line Items</a>.</p>
 <hr>
 <h2 id="how-a-field-is-found">How a field is found</h2>
-<p>The application tries several approaches for each field and keeps the first that works, from the most reliable to the most resourceful:</p>
+<p>The application tries several approaches for each field, from the most reliable to the most resourceful:</p>
 <ol>
 <li><strong>The label with the value beside it</strong> — <code>Furnizor: SC ALFA SRL</code>.</li>
 <li><strong>The label with the value on one of the next lines.</strong> This is what column headings and block layouts need:</li>
 </ol>
-<p>``<code> Nr. factura     Data emiterii        FURNIZOR GML-7781        02.02.2024           SC ALFA CONSTRUCT SRL </code>``</p>
+<p>``<code> Nr. factura     Data emiterii        Termen de plata GML-7781        02.02.2024           02.03.2024 </code>``</p>
+<p>Notice the second and third columns. The application takes the value under <strong>its own heading</strong>, not simply the first one it meets, so <code>Termen de plata</code> reads <code>02.03.2024</code> and not the issue date beside it.</p>
 <ol>
 <li><strong>The value recognised by its own shape</strong>, in the right part of the page — a fiscal code is unmistakable wherever it is printed.</li>
 <li><strong>A reasoned guess</strong>, when nothing is labelled: the company name in the letterhead, the first plausible date, or the largest amount as the total.</li>
 </ol>
 <p>So an invoice that labels nothing at all still comes back filled in. When the page is not an invoice, the guessing stops rather than inventing figures.</p>
+<p><strong>And then it checks.</strong> Several of these fields can be verified — a fiscal code by its control digit, a bank account by its checksum, a date against the calendar, the three amounts against each other. Where a check fails, the application goes back and tries the next approach instead of reporting what it first found. <a href="How-It-Reads.html">How It Reads</a> explains this in full.</p>
 <h2 id="which-labels-are-recognised">Which labels are recognised</h2>
-<p>Matching ignores capitals and accepts missing diacritics, so <code>FURNIZOR</code>, <code>Furnizor</code> and <code>furnizor</code> all work, as do <code>Vânzător</code> and <code>Vanzator</code>. It also tolerates the letters recognition confuses with digits, so <code>RO 33O44SS</code> is still read as a fiscal code and <code>l.428,OO</code> as an amount.</p>
+<p>Matching ignores capitals and accepts missing diacritics, so <code>FURNIZOR</code>, <code>Furnizor</code> and <code>furnizor</code> all work, as do <code>Vânzător</code> and <code>Vanzator</code>. It also tolerates the letters recognition confuses with digits, so <code>RO 33O44S4</code> is still read as a fiscal code and <code>l.428,OO</code> as an amount.</p>
 <h3 id="1-furnizor-supplier">1. Furnizor — supplier</h3>
 <p>Recognised labels: <strong>Furnizor</strong>, <strong>Emitent</strong>, <strong>Vânzător</strong>, <strong>Prestator</strong></p>
 <p>Takes the rest of the line after the label, or the company name on one of the next lines when the label is a heading. A supplier with <strong>no label at all</strong> is still found: the application looks for a line carrying a legal form — <code>SRL</code>, <code>SA</code>, <code>PFA</code>, <code>SNC</code> — and takes that, skipping address lines that happen to mention one.</p>
 <p>On an invoice that names the buyer as well, the search is confined to the supplier's part of the page, so the buyer's name and code are never reported in the supplier's fields — even when the buyer is printed first.</p>
-<h3 id="2-serie-numar-invoice-number">2. Serie / Numar — invoice number</h3>
+<h3 id="2-cumparator-buyer">2. Cumparator — buyer</h3>
+<p>Recognised labels: <strong>Cumparator</strong>, <strong>Client</strong>, <strong>Beneficiar</strong>, <strong>Achizitor</strong></p>
+<p>The mirror image of the supplier, with one deliberate difference: there is no letterhead fallback. An invoice that never names a buyer reports <strong>N/A</strong>, rather than repeating the supplier under a second heading.</p>
+<h3 id="3-serie-numar-invoice-number">3. Serie / Numar — invoice number</h3>
 <p>Recognised, in order of preference:</p>
 <ol>
 <li><strong>Seria si numarul:</strong> <code>AB 1024</code></li>
@@ -88,25 +102,39 @@
 <li><strong>Invoice no.</strong> / <strong>Invoice number</strong> (English invoices)</li>
 </ol>
 <p>Letters, digits, <code>-</code> and <code>/</code> are kept; the result is upper-cased.</p>
-<h3 id="3-data-emiterii-issue-date">3. Data emiterii — issue date</h3>
+<h3 id="4-data-emiterii-issue-date">4. Data emiterii — issue date</h3>
 <p>Recognised, in order of preference: <strong>Data facturii</strong>, <strong>Data emiterii</strong>, <strong>Data</strong>, <strong>Date</strong>.</p>
-<p>The value must be a day-first date: <code>05.03.2024</code>, <code>5/3/2024</code>, <code>05-03-24</code>.</p>
-<h3 id="4-cui-cif-fiscal-code">4. CUI / CIF — fiscal code</h3>
+<p>The value must be a day-first date: <code>05.03.2024</code>, <code>5/3/2024</code>, <code>05-03-24</code> — and it must be a day that exists. <code>31.02.2024</code> is a shape, not a date, so the application refuses it and looks elsewhere on the page.</p>
+<h3 id="5-data-scadentei-due-date">5. Data scadentei — due date</h3>
+<p>Recognised labels: <strong>Termen de plata</strong>, <strong>Scadenta</strong>, <strong>Data scadentei</strong>.</p>
+<p>Most invoices never print this date. What they print instead is the <em>term</em> — "Termen de plata: 30 zile" — which says the same thing a different way, so the application adds the days to the issue date and reports the result. A due date earlier than the issue date is marked for you to check rather than believed.</p>
+<h3 id="6-cui-cif-fiscal-code">6. CUI / CIF — fiscal code</h3>
 <p>Recognised: <strong>Cod unic de identificare fiscala</strong>, <strong>Cod fiscal</strong>, <strong>CUI</strong>, <strong>CIF</strong> — with or without dots and spaces, so <code>C.U.I.</code> and <code>CUI</code> both work.</p>
-<p>The value is 2 to 10 digits, with an optional <code>RO</code> prefix.</p>
-<h3 id="5-tva-vat-amount">5. TVA — VAT amount</h3>
+<p>The value is 2 to 10 digits, with an optional <code>RO</code> prefix. Romanian fiscal codes carry a <strong>control digit</strong>, so the application can tell whether it read one correctly. Of two codes printed identically on the same page, the one that adds up is the one it reports.</p>
+<h3 id="7-reg-comertului-trade-register-number">7. Reg. Comertului — trade register number</h3>
+<p>Recognised: <strong>Reg. Com.</strong>, <strong>Registrul Comertului</strong>, <strong>Nr. ORC</strong> — and the shape <code>J40/1122/2015</code> on its own, which is distinctive enough to be found without a label.</p>
+<h3 id="8-cont-bancar-iban">8. Cont bancar — IBAN</h3>
+<p>Recognised: <strong>IBAN</strong>, <strong>Cont</strong>, <strong>Cont bancar</strong>, <strong>Cod IBAN</strong>.</p>
+<p>Every IBAN carries a checksum, and this field is the one where a plausible wrong answer costs real money. So the application applies the checksum as a <strong>veto</strong>: if an account does not verify, it is reported as <strong>N/A</strong> rather than shown. What you see in this field has been checked arithmetically.</p>
+<p>The value is printed in groups of four, which is how a bank account is meant to be read back.</p>
+<h3 id="9-total-fara-tva-net-amount">9. Total fara TVA — net amount</h3>
+<p>Recognised: <strong>Total fara TVA</strong>, <strong>Valoare fara TVA</strong>, <strong>Baza impozabila</strong>, <strong>Subtotal</strong>.</p>
+<p>Frequently not printed at all — in which case it is worked out, either from the other two amounts or by adding up the rows of the goods table. See <a href="How-It-Reads.html">How It Reads</a>.</p>
+<h3 id="10-tva-vat-amount">10. TVA — VAT amount</h3>
 <p>Recognised, in order of preference: <strong>Total TVA</strong>, <strong>Valoare TVA</strong>, <strong>TVA</strong>.</p>
-<p>A rate printed between the label and the amount is skipped, so <code>Total TVA 19% 190,00</code> yields <code>190.00</code> — the amount, not the rate.</p>
-<h3 id="6-total-de-plata-total-due">6. Total de plata — total due</h3>
+<p>A rate printed between the label and the amount is skipped, so <code>Total TVA 19% 190,00</code> yields <code>190.00</code> — the amount, not the rate. <code>Total fara TVA</code> is the <em>net</em> line and is never mistaken for this one.</p>
+<h3 id="11-total-de-plata-total-due">11. Total de plata — total due</h3>
 <p>Recognised, in order of preference: <strong>Total de plata</strong>, <strong>Total general</strong>, <strong>Total factura</strong>, <strong>Total</strong>.</p>
-<p>A currency written after the amount (<code>LEI</code>, <code>RON</code>, <code>EUR</code>) is ignored.</p>
+<p>A currency written after the amount is not swallowed into it; it goes into the currency field instead.</p>
+<h3 id="12-moneda-currency">12. Moneda — currency</h3>
+<p>Recognised: <code>RON</code>, <code>LEI</code>, <code>EUR</code>, <code>USD</code>, <code>GBP</code>, <code>CHF</code>, <code>MDL</code>, read from the totals block so that a currency word elsewhere on the page cannot be mistaken for it. <code>LEI</code> is reported as <strong>RON</strong> — the same currency under its official code, which is what an accounting import expects.</p>
 <hr>
 <h2 id="why-the-order-matters">Why the order matters</h2>
 <p>Invoices routinely print a subtotal labelled <code>Total</code> above the real <code>Total de plata</code>:</p>
 <pre><code>Total                 1.000,00
 Total TVA 19%           190,00
 Total de plata        1.190,00</code></pre>
-<p>The application checks the <strong>most specific label first</strong>, so it reports <code>1190.00</code>, not the <code>1.000,00</code> that appears higher on the page. The same preference order applies to every field above.</p>
+<p>The application checks the <strong>most specific label first</strong>, so it reports <code>1190.00</code>, not the <code>1.000,00</code> that appears higher on the page. The same preference order applies to every field above — and where a value can be checked, a later approach whose answer <em>verifies</em> is preferred to an earlier one whose answer does not.</p>
 <hr>
 <h2 id="how-values-are-cleaned-up">How values are cleaned up</h2>
 <p>What you see in the right-hand panel is normalised, so that two invoices which print the same amount differently end up identical in your records.</p>
@@ -118,7 +146,10 @@ Total de plata        1.190,00</code></pre>
 <tbody>
 <tr><td>Amounts</td><td><code>1.190,00</code> <code>1,190.00</code> <code>1 190,00</code> <code>1190,00 LEI</code></td><td><code>1190.00</code></td></tr>
 <tr><td>Dates</td><td><code>5.3.2024</code> <code>05/03/2024</code> <code>05-03-24</code></td><td><code>05.03.2024</code></td></tr>
-<tr><td>Fiscal code</td><td><code>RO 12.345.678</code> <code>ro-12345678</code></td><td><code>RO12345678</code></td></tr>
+<tr><td>Fiscal code</td><td><code>RO 12.345.674</code> <code>ro-12345674</code></td><td><code>RO12345674</code></td></tr>
+<tr><td>Register number</td><td><code>J 40 / 1122 / 2015</code></td><td><code>J40/1122/2015</code></td></tr>
+<tr><td>IBAN</td><td><code>ro49aaaa1b3100759384 0000</code></td><td><code>RO49 AAAA 1B31 0075 9384 0000</code></td></tr>
+<tr><td>Currency</td><td><code>lei</code></td><td><code>RON</code></td></tr>
 <tr><td>Number</td><td><code> fct-2024/0182 </code></td><td><code>FCT-2024/0182</code></td></tr>
 <tr><td>Supplier</td><td><code>SC   EXEMPLU   SRL |</code></td><td><code>SC EXEMPLU SRL</code></td></tr>
 </tbody>
@@ -128,13 +159,13 @@ Total de plata        1.190,00</code></pre>
 <p><strong>Dates</strong> always come out as <code>dd.MM.yyyy</code>, and a two-digit year becomes 20xx (<code>24</code> → <code>2024</code>). If a value is not a plausible date — <code>32.01.2024</code>, or an ISO-style <code>2024-03-05</code> — it is shown exactly as it was read rather than reformatted into something wrong. That is a deliberate signal to check the raw panel.</p>
 <hr>
 <h2 id="fields-the-application-does-not-extract">Fields the application does not extract</h2>
-<p>Only the six above. In particular it does <strong>not</strong> read individual table rows (product, quantity, unit price), the delivery address, the bank account or the registration number <code>J40/1234/2019</code>. Those appear in the raw panel, and you can copy them from there, but they are not parsed into the summary.</p>
+<p>Only the twelve above, plus the goods table. In particular it does <strong>not</strong> read the delivery address, the person who signed, the means of transport or the payment reference. Those appear in the raw panel, and you can copy them from there, but they are not parsed into the summary.</p>
 <hr>
-<p><strong>See also:</strong> <a href="Preparing-Invoices.html">Preparing Invoices</a> when fields come out <code>N/A</code> · <a href="Troubleshooting.html">Troubleshooting</a> for wrong values</p>
+<p><strong>See also:</strong> <a href="Line-Items.html">Line Items</a> for the goods table · <a href="How-It-Reads.html">How It Reads</a> for the checks behind these values · <a href="Preparing-Invoices.html">Preparing Invoices</a> when fields come out <code>N/A</code> · <a href="Troubleshooting.html">Troubleshooting</a> for wrong values</p>
 </article>
 <nav class="pager" aria-label="Pagination">
 <a class="prev" href="The-Main-Window.html"><span>Previous</span>The Main Window</a>
-<a class="next" href="Exporting.html"><span>Next</span>Exporting</a>
+<a class="next" href="Line-Items.html"><span>Next</span>Line Items</a>
 </nav>
 </main>
 </div>

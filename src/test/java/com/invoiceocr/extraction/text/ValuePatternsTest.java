@@ -162,4 +162,85 @@ class ValuePatternsTest {
                     first(ValuePatterns.seriesAndNumber(), "Seria si numarul de mai jos"));
         }
     }
+
+    @Nested
+    @DisplayName("Fields added in 1.2.0")
+    class NewShapes {
+
+        @DisplayName("reads a trade-register number in any of its county forms")
+        @ParameterizedTest(name = "{0}")
+        @ValueSource(strings = {"J40/1122/2015", "J 12/345/2018", "F03/99/2001", "C40/1/1999"})
+        void readsRegistrationNumbers(String printed) {
+            assertTrue(first(ValuePatterns.registrationNumber(), "Reg. Com. " + printed).isPresent());
+        }
+
+        @Test
+        @DisplayName("a date is not a register number, however similar the slashes look")
+        void refusesADateAsARegistrationNumber() {
+            assertEquals(Optional.empty(),
+                    first(ValuePatterns.registrationNumber(), "emisa 05/03/2024"));
+        }
+
+        @Test
+        @DisplayName("reads an account whether or not it is printed in groups")
+        void readsIbans() {
+            assertEquals(Optional.of("RO49 AAAA 1B31 0075 9384 0000"),
+                    first(ValuePatterns.iban(), "IBAN: RO49 AAAA 1B31 0075 9384 0000"));
+            assertEquals(Optional.of("RO49AAAA1B3100759384"),
+                    first(ValuePatterns.iban(), "Cont RO49AAAA1B3100759384"));
+        }
+
+        @DisplayName("reads the currency an invoice is denominated in")
+        @ParameterizedTest(name = "{0}")
+        @ValueSource(strings = {"RON", "LEI", "EUR", "USD"})
+        void readsCurrencies(String code) {
+            assertEquals(Optional.of(code),
+                    first(ValuePatterns.currency(), "Total de plata 100,00 " + code));
+        }
+
+        @Test
+        @DisplayName("a currency code inside a word is not a currency")
+        void refusesACurrencyInsideAWord() {
+            assertEquals(Optional.empty(), first(ValuePatterns.currency(), "LEIPZIG"));
+        }
+
+        @Test
+        @DisplayName("reads the VAT rate beside its own label and nowhere else")
+        void readsTheVatRate() {
+            assertEquals(Optional.of("19"), first(ValuePatterns.vatRate(), "TVA 19%"));
+            assertEquals(Optional.of("21"), first(ValuePatterns.vatRate(), "T.V.A. 21 %"));
+            assertEquals(Optional.empty(), first(ValuePatterns.vatRate(), "Discount 10%"));
+        }
+
+        @Test
+        @DisplayName("reads a quantity as a small number, whole or fractional")
+        void readsQuantities() {
+            assertEquals(Optional.of("10"), first(ValuePatterns.quantity(), "10"));
+            assertEquals(Optional.of("2,5"), first(ValuePatterns.quantity(), "2,5"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Landmarks on the page")
+    class Landmarks {
+
+        @Test
+        @DisplayName("the summary block starts at the net line, not at a Total column heading")
+        void findsTheTotalsBlock() {
+            assertTrue(ValuePatterns.TOTALS_MARKER.matcher("Total fara TVA   100,00").find());
+            assertTrue(ValuePatterns.TOTALS_MARKER.matcher("   Total de plata 119,00").find());
+            assertFalse(ValuePatterns.TOTALS_MARKER.matcher("Denumire    Cant    Total").find(),
+                    "a Total column heading is not the totals block");
+        }
+
+        @Test
+        @DisplayName("a heading row needs two headings, so a summary line cannot pass as one")
+        void findsTheTableHeading() {
+            assertTrue(ValuePatterns.TABLE_HEADING.matcher(
+                    "Denumire                Cant    Pret      Valoare").find());
+            assertTrue(ValuePatterns.TABLE_HEADING.matcher(
+                    "Nr. crt  Descriere   Valoare").find());
+            assertFalse(ValuePatterns.TABLE_HEADING.matcher("Valoare TVA   159,60").find());
+        }
+    }
 }

@@ -114,6 +114,37 @@ class PdfInvoiceExporterTest {
         assertTrue(pdf.contains("ACME \\(Romania\\) \\\\ Ltd"));
     }
 
+    @Test
+    @DisplayName("sets the goods table, its columns aligned by the monospaced font")
+    void writesTheGoodsTable() throws IOException {
+        InvoiceData data = InvoiceData.of(
+                RecognizedText.of(""),
+                List.of(ExtractedField.of(InvoiceFields.SUPPLIER, "ACME SRL")),
+                List.of(com.invoiceocr.domain.LineItem.of("Ciment Portland", "10", "32.00", "320.00"),
+                        com.invoiceocr.domain.LineItem.of("Manopera", null, null, "870.00")));
+
+        String pdf = latin1(export(data));
+
+        assertTrue(pdf.contains("report.items.title"));
+        assertTrue(pdf.contains("Ciment Portland"));
+        assertTrue(pdf.contains("Manopera"));
+        assertTrue(pdf.contains("320.00"));
+    }
+
+    @Test
+    @DisplayName("marks an inferred value and prints the explanation once")
+    void marksInferredValues() throws IOException {
+        InvoiceData data = InvoiceData.of(
+                RecognizedText.of(""),
+                List.of(ExtractedField.of(InvoiceFields.TOTAL_AMOUNT, "1190.00",
+                        com.invoiceocr.domain.FieldConfidence.INFERRED, "shape-largest")));
+
+        String pdf = latin1(export(data));
+
+        assertTrue(pdf.contains("1190.00 report.reviewMark"));
+        assertTrue(pdf.contains("report.reviewHint"));
+    }
+
     private byte[] export(InvoiceData data) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         exporter.write(data, out);

@@ -34,6 +34,8 @@
 </li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -74,20 +76,34 @@
 <p class="figure"><img src="images/result.png" alt="Both panels filled in after a successful run" loading="lazy"></p>
 <p>The window fills in two panels:</p>
 <p><strong>Left — Text OCR brut</strong> (<em>Raw OCR text</em>) Exactly what the recognition engine read, line by line, in a fixed-width font. This panel is your evidence. If a field came out wrong, look here first: you will usually see that the engine misread a character, rather than the application mis-assigning a value.</p>
-<p><strong>Right — Date extrase (structurat)</strong> (<em>Extracted data, structured</em>) The six fields, cleaned up and normalised:</p>
+<p><strong>Right — Date extrase (structurat)</strong> (<em>Extracted data, structured</em>) The twelve fields, cleaned up and normalised, with the goods table beneath them:</p>
 <pre><code>==============================================
 DATE FACTURA
 ==============================================
 
-Furnizor       : SC EXEMPLU DISTRIBUTIE SRL
-Serie / Numar  : FCT-2024/0182
-Data emiterii  : 05.03.2024
-CUI / CIF      : RO12345678
-TVA            : 190.00
-Total de plata : 1190.00
+Furnizor            : SC EXEMPLU DISTRIBUTIE SRL
+Cumparator          : N/A
+Serie / Numar       : FCT-2024/0182
+Data emiterii       : 05.03.2024
+Data scadentei      : N/A
+CUI / CIF           : RO12345674
+Reg. Comertului     : N/A
+Cont bancar (IBAN)  : N/A
+Total fara TVA      : 1000.00
+TVA                 : 190.00
+Total de plata      : 1190.00
+Moneda              : RON (?)
 
-Campuri identificate: 6 din 6</code></pre>
-<p>The status bar confirms the same thing: <code>factura-exemplu.png: 6 campuri identificate</code> (<em>6 fields identified</em>).</p>
+----------------------------------------------
+Articole
+----------------------------------------------
+Denumire                  Cant  Pret unitar     Valoare
+Servicii consultanta IT      1      700.00      700.00
+Licenta software anuala      1      300.00      300.00
+
+Campuri identificate: 8 din 12</code></pre>
+<p>The status bar confirms the same thing: <code>factura-exemplu.png: 8 campuri identificate, 1 de verificat</code> (<em>8 fields identified, 1 to check</em>).</p>
+<p>Notice the <strong>(?)</strong> beside the currency. It marks a value the application worked out rather than read from its own label — see <a href="How-It-Reads.html">How It Reads</a>. Everything without a mark was read directly, or checked arithmetically.</p>
 <p>What each field means, and which invoice labels the application looks for, is explained in <a href="Extracted-Fields.html">Extracted Fields</a>.</p>
 <hr>
 <h2 id="step-5-use-the-result">Step 5 — Use the result</h2>
@@ -110,7 +126,7 @@ Campuri identificate: 6 din 6</code></pre>
 <p>Just click <strong>Incarca factura</strong> again; the new result replaces the old one. Use <strong>Goleste</strong> (<em>Clear</em>) if you want to empty both panels first — useful when you step away and do not want to mistake an old result for a new one.</p>
 <hr>
 <h2 id="when-fields-show-na">When fields show N/A</h2>
-<p><code>N/A</code> means the application did not find that field, and it refuses to guess. The footer tells you how many of the six were found, for example <code>Campuri identificate: 4 din 6</code>.</p>
+<p><code>N/A</code> means the application did not find that field, and it refuses to guess. The footer tells you how many of the twelve were found, for example <code>Campuri identificate: 8 din 12</code>. A blank field is not always a failure: most invoices genuinely do not print a bank account or a due date.</p>
 <p>The three usual causes, in order of likelihood:</p>
 <ol>
 <li><strong>The scan is hard to read</strong> — the most common by far. → <a href="Preparing-Invoices.html">Preparing Invoices</a></li>

@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html" aria-current="page">Settings</a>
@@ -31,6 +33,8 @@
 <li><a href="#where-settings-live">Where settings live</a></li>
 <li><a href="#complete-reference">Complete reference</a></li>
 <li><a href="#recognition-language">Recognition language</a></li>
+<li><a href="#how-many-times-a-page-is-read">How many times a page is read</a></li>
+<li><a href="#the-goods-table-and-the-report-marks">The goods table and the report marks</a></li>
 <li><a href="#page-segmentation-mode">Page segmentation mode</a></li>
 <li><a href="#engine-mode">Engine mode</a></li>
 <li><a href="#document-formats">Document formats</a></li>
@@ -81,11 +85,16 @@ ui.locale=ro</code></pre>
 <tbody>
 <tr><td><code>ocr.tessdata.path</code></td><td><code>C:/Program Files/Tesseract-OCR/tessdata</code></td><td>Folder holding the <code>*.traineddata</code> language files. <strong>The one setting you must get right.</strong></td></tr>
 <tr><td><code>ocr.language</code></td><td><code>eng</code></td><td>Which language(s) to recognise. Combine with <code>+</code></td></tr>
-<tr><td><code>ocr.pageSegmentationMode</code></td><td><code>3</code></td><td>How the page is divided into text blocks</td></tr>
+<tr><td><code>ocr.pageSegmentationMode</code></td><td><code>3</code></td><td>How the page is divided into text blocks, for the first reading</td></tr>
 <tr><td><code>ocr.engineMode</code></td><td><code>3</code></td><td>Which recognition engine variant to use</td></tr>
+<tr><td><code>ocr.passes.maximum</code></td><td><code>4</code></td><td>How many times a page may be read before the answers are compared</td></tr>
+<tr><td><code>ocr.passes.targetConfidence</code></td><td><code>0.80</code></td><td>How sure a reading has to be before the application stops trying</td></tr>
 <tr><td><code>document.supportedExtensions</code></td><td><code>png,jpg,jpeg,bmp,tif,tiff,gif</code></td><td>Formats offered in the file dialog</td></tr>
 <tr><td><code>image.preprocessing.enabled</code></td><td><code>true</code></td><td>Whether images are prepared before recognition</td></tr>
 <tr><td><code>image.preprocessing.minimumWidth</code></td><td><code>1000</code></td><td>Images narrower than this are enlarged</td></tr>
+<tr><td><code>extraction.lineItems.enabled</code></td><td><code>true</code></td><td>Whether the rows of the goods table are read</td></tr>
+<tr><td><code>report.showConfidence</code></td><td><code>true</code></td><td>Whether values that were worked out are marked <strong>(?)</strong></td></tr>
+<tr><td><code>report.lineItems</code></td><td><code>true</code></td><td>Whether reports include the table rows</td></tr>
 <tr><td><code>export.defaultFormat</code></td><td><code>pdf</code></td><td>Format the export dialog opens on</td></tr>
 <tr><td><code>ui.locale</code></td><td><code>ro</code></td><td>Interface language: <code>ro</code> or <code>en</code></td></tr>
 </tbody>
@@ -100,8 +109,42 @@ ocr.language=eng        # English invoices</code></pre>
 <p><code>ron+eng</code> is the best default for Romanian business invoices: many carry English product names, and the combination handles both. It is slightly slower than a single language.</p>
 <p>If the file is missing, the application tells you exactly which one it wanted and what it found instead — see <a href="Troubleshooting.html#language-file-not-found">Troubleshooting</a>.</p>
 <hr>
+<h2 id="how-many-times-a-page-is-read">How many times a page is read</h2>
+<p>New in 1.2. The application reads each page up to four times, preparing the picture differently each time, and compares the answers — see <a href="How-It-Reads.html">How It Reads</a>. Two settings control it:</p>
+<pre><code>ocr.passes.maximum=4
+ocr.passes.targetConfidence=0.80</code></pre>
+<p><code>ocr.passes.maximum</code> is the ceiling, not a quota. Reading stops as soon as one attempt is good enough, so a clean scan costs a single pass whatever this is set to. It only matters for pages that are <em>not</em> read well the first time.</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Value</th><th>Effect</th></tr>
+</thead>
+<tbody>
+<tr><td><code>4</code> <em>(default)</em></td><td>The full ladder: plain, straightened, black-and-white, sharpened</td></tr>
+<tr><td><code>2</code></td><td>Plain and straightened only — helps photographs, skips the expensive passes</td></tr>
+<tr><td><code>1</code></td><td>One reading, exactly as version 1.1 behaved</td></tr>
+</tbody>
+</table>
+</div>
+<p><code>ocr.passes.targetConfidence</code> is the bar an attempt has to clear. Raise it to <code>0.95</code> and the application will work harder on awkward scans; lower it to <code>0.5</code> and it will accept the first reading more readily.</p>
+<pre><code># A scanner producing clean pages, and speed matters
+ocr.passes.maximum=1
+
+# Photographs from a phone, and accuracy matters more than seconds
+ocr.passes.targetConfidence=0.95</code></pre>
+<p>Setting <code>image.preprocessing.enabled=false</code> overrides both: the picture is passed through untouched, once.</p>
+<hr>
+<h2 id="the-goods-table-and-the-report-marks">The goods table and the report marks</h2>
+<pre><code>extraction.lineItems.enabled=true
+report.showConfidence=true
+report.lineItems=true</code></pre>
+<p><code>extraction.lineItems.enabled=false</code> stops the application reading the product rows at all. <code>report.lineItems=false</code> keeps reading them — so they still help check the net amount — but leaves them out of the report and the exports.</p>
+<p><code>report.showConfidence=false</code> removes the <strong>(?)</strong> marks and the note that explains them. The status bar still counts what would have been marked. Leave this on unless the marks are getting in the way of a downstream process; they are the only signal telling you which figures were worked out rather than read.</p>
+<p>See <a href="Line-Items.html">Line Items</a>.</p>
+<hr>
 <h2 id="page-segmentation-mode">Page segmentation mode</h2>
-<p><code>ocr.pageSegmentationMode</code> tells the engine how the page is laid out. Only a few values are worth trying:</p>
+<p><code>ocr.pageSegmentationMode</code> tells the engine how the page is laid out. It applies to the <strong>first</strong> reading; the later passes try other layouts of their own, which is part of what makes them worth running.</p>
+<p>Only a few values are worth trying:</p>
 <div class="table-wrap">
 <table>
 <thead>
@@ -141,7 +184,8 @@ ocr.language=eng        # English invoices</code></pre>
 <h2 id="image-preparation">Image preparation</h2>
 <pre><code>image.preprocessing.enabled=true
 image.preprocessing.minimumWidth=1000</code></pre>
-<p>With preparation enabled, small images are enlarged (up to 4×) and everything is converted to greyscale before recognition. Setting <code>minimumWidth=0</code> keeps greyscale conversion but disables enlargement. Setting <code>enabled=false</code> passes your image through untouched, which is only sensible if you pre-process scans yourself.</p>
+<p>With preparation enabled, small images are enlarged (up to 4×) and everything is converted to greyscale before recognition — and, on the later passes, straightened, contrast-stretched, converted to black and white or sharpened. Setting <code>minimumWidth=0</code> keeps the rest but disables enlargement.</p>
+<p>Setting <code>enabled=false</code> passes your image through untouched <strong>and collapses the ladder to a single reading</strong>, which is only sensible if you pre-process scans yourself.</p>
 <hr>
 <h2 id="default-export-format">Default export format</h2>
 <p>Which format the save dialog opens on. You can still pick any other format in the dialog itself; this only decides the starting point.</p>

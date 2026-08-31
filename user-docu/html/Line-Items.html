@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Line Items &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html" aria-current="page">Line Items</a>
+<ul class="sections">
+<li><a href="#what-you-get">What you get</a></li>
+<li><a href="#what-it-copes-with">What it copes with</a></li>
+<li><a href="#when-it-finds-nothing">When it finds nothing</a></li>
+<li><a href="#the-rows-check-the-total">The rows check the total</a></li>
+<li><a href="#turning-it-off">Turning it off</a></li>
+</ul>
+</li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="line-items">Line Items</h1>
+<p>New in version 1.2: as well as the twelve header fields, the application reads the <strong>rows of the goods table</strong> — what was sold, how much of it, at what price.</p>
+<p>Until now this was the most-requested thing it could not do. The rows appeared in the raw panel and had to be copied out by hand.</p>
+<hr>
+<h2 id="what-you-get">What you get</h2>
+<p>For a table printed like this:</p>
+<pre><code>Nr. crt  Denumire produs        Cant     Pret      Valoare
+1        Ciment Portland          10    32,00       320,00
+2        Nisip spalat sac         25     8,00       200,00
+3        Caramida BCA            100     4,50       450,00
+4        Transport                 1    30,00        30,00</code></pre>
+<p>the report shows:</p>
+<pre><code>----------------------------------------------
+Articole
+----------------------------------------------
+Denumire                  Cant  Pret unitar     Valoare
+Ciment Portland             10        32.00      320.00
+Nisip spalat sac            25         8.00      200.00
+Caramida BCA               100         4.50      450.00
+Transport                    1        30.00       30.00</code></pre>
+<p>Every export carries the same rows. See <a href="Exporting.html">Exporting</a>.</p>
+<hr>
+<h2 id="what-it-copes-with">What it copes with</h2>
+<p><strong>Any combination of columns.</strong> Invoices print different ones. The application reads each row <strong>from the right</strong>, where the meaning is stable: the last number on a line is what the row comes to, and everything before the first number is what was sold. A row that lost its unit-price column to a smudge still gives you a description and a value.</p>
+<p><strong>A "Nr. crt" column.</strong> The row number in front of the description is recognised as a row number and dropped, rather than being read as the quantity.</p>
+<p><strong>Two-column tables.</strong> With only two figures on a row, the application decides by the decimals: <code>2  450,00</code> is a quantity and a value; <code>30,50  450,00</code> is a unit price and a value.</p>
+<p><strong>Rules and separators.</strong> Lines of dashes, blank lines and a subtotal printed in the middle of the table are not rows and are skipped.</p>
+<p>Columns the invoice did not print are shown as <strong>N/A</strong>, not as zero.</p>
+<hr>
+<h2 id="when-it-finds-nothing">When it finds nothing</h2>
+<p>The table has to have a <strong>heading row</strong> — a line carrying both a description column (<code>Denumire</code>, <code>Descriere</code>, <code>Produs</code>, <code>Articol</code>, <code>Nr. crt</code>) and a figure column (<code>Cant</code>, <code>Pret</code>, <code>Valoare</code>, <code>Suma</code>, <code>U.M.</code>).</p>
+<p>Without one, the application reports no rows at all. That is deliberate: an invoice whose table cannot be located is one whose rows should not be guessed at, and a made-up table is worse than none.</p>
+<p>If your invoices use headings the application does not know, the rows will be missing while every header field is read normally. The raw panel still shows them.</p>
+<hr>
+<h2 id="the-rows-check-the-total">The rows check the total</h2>
+<p>There is a second reason to read the table, beyond copying it out: the rows have to <strong>add up to the net amount</strong>. That gives the application a second, independent reading of a figure it otherwise takes on trust.</p>
+<ul>
+<li>If the net amount was printed and the rows agree with it, both are confirmed.</li>
+<li>If the net amount was <strong>not</strong> printed, the sum of the rows can supply it — but only when another figure on the page agrees. A table with a row that recognition missed sums to too little, and a confidently wrong net amount is worse than an absent one.</li>
+</ul>
+<p>You will see the result of this in the report rather than the mechanism: an invoice whose "Total fara TVA" line was never printed now usually has one.</p>
+<hr>
+<h2 id="turning-it-off">Turning it off</h2>
+<p>If you only want the header fields, add this to <code>invoice-ocr.properties</code> next to the application:</p>
+<pre><code>extraction.lineItems.enabled=false</code></pre>
+<p>Or keep reading the table but leave it out of reports:</p>
+<pre><code>report.lineItems=false</code></pre>
+<p>See <a href="Settings.html">Settings</a>.</p>
+<hr>
+<p><strong>See also:</strong> <a href="Extracted-Fields.html">Extracted Fields</a> for the header fields · <a href="Exporting.html">Exporting</a> for how the rows appear in each format · <a href="How-It-Reads.html">How It Reads</a> for the checking the rows take part in</p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Extracted-Fields.html"><span>Previous</span>Extracted Fields</a>
+<a class="next" href="How-It-Reads.html"><span>Next</span>How It Reads</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

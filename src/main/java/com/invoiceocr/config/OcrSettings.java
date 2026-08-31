@@ -31,4 +31,20 @@ public interface OcrSettings {
 
     /** Images narrower than this get upscaled before OCR; {@code 0} disables upscaling. */
     int minimumWidth();
+
+    /**
+     * How many differently-prepared readings of one page may be made before the
+     * results are merged. {@code 1} restores the single-pass behaviour of 1.1.
+     */
+    int maximumPasses();
+
+    /**
+     * Mean confidence at which a reading is accepted without trying another
+     * preparation of the image. Higher means more passes and better accuracy on
+     * awkward pages; lower means faster.
+     */
+    double targetConfidence();
+
+    /** Whether the rows of the goods table are read as well as the header fields. */
+    boolean lineItemsEnabled();
 }

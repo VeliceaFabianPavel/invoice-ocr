@@ -59,7 +59,7 @@ $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 
 $AppName    = 'Invoice OCR'
-$AppVersion = '1.1.1'
+$AppVersion = '1.2.0'
 $AppRegKey  = 'HKLM:\SOFTWARE\InvoiceOCR'
 $UninstKey  = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\InvoiceOCR'
 $MinJava    = 17
@@ -371,13 +371,33 @@ if (Test-Path (Join-Path $tessdata 'ron.traineddata')) { $language = 'ron+eng' }
 
 # A .properties file reads a backslash as an escape, so paths use forward slashes.
 $tessdataForProperties = $tessdata -replace '\\', '/'
+# Only the settings this machine actually needs are written live. The rest are
+# listed commented-out: it makes them discoverable in the file the user is told
+# to edit, while leaving the defaults where they belong - in the jar - so a later
+# release can change one without every installed machine overriding it.
 @(
-    "# $AppName settings, written by the installer.",
+    "# $AppName $AppVersion settings, written by the installer.",
     '# Use forward slashes in paths. Restart the application after editing.',
     '',
     "ocr.tessdata.path=$tessdataForProperties",
     "ocr.language=$language",
-    'ui.locale=ro'
+    'ui.locale=ro',
+    '',
+    '# --- reading (1.2.0) ------------------------------------------------',
+    '# A page is read up to this many times, each with the picture prepared',
+    '# differently, and the answers compared. Reading stops as soon as one is',
+    '# good enough, so a clean scan still costs a single pass.',
+    '#   1 = one reading, exactly as version 1.1 behaved',
+    '#ocr.passes.maximum=4',
+    '#ocr.passes.targetConfidence=0.80',
+    '',
+    '# Read the rows of the goods table, and mark values that were worked',
+    '# out rather than read from their own label.',
+    '#extraction.lineItems.enabled=true',
+    '#report.showConfidence=true',
+    '#report.lineItems=true',
+    '',
+    '# Every setting is documented in docs\index.html -> Settings.'
 ) | Set-Content -Path $properties -Encoding UTF8
 Write-Ok "ocr.tessdata.path=$tessdataForProperties, ocr.language=$language"
 

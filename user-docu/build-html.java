@@ -42,6 +42,8 @@ public final class BuildHtml {
             "Getting-Started.md",
             "The-Main-Window.md",
             "Extracted-Fields.md",
+            "Line-Items.md",
+            "How-It-Reads.md",
             "Exporting.md",
             "Preparing-Invoices.md",
             "Settings.md",

@@ -26,7 +26,7 @@ class ExtractionStrategiesTest {
 
             assertEquals(Optional.of("05.03.2024"),
                     LabelledValueExtractor.sameLine("Data facturii" + ValuePatterns.SEPARATOR,
-                            ValuePatterns.date()).extract(text));
+                            ValuePatterns.date()).extractValue(text));
         }
 
         @Test
@@ -39,7 +39,7 @@ class ExtractionStrategiesTest {
 
             assertEquals(Optional.of("02.02.2024"),
                     LabelledValueExtractor.within("Data emiterii" + ValuePatterns.SEPARATOR,
-                            ValuePatterns.date(), 2).extract(text));
+                            ValuePatterns.date(), 2).extractValue(text));
         }
 
         @Test
@@ -48,7 +48,7 @@ class ExtractionStrategiesTest {
             SearchText text = SearchText.of("Data emiterii\n\n\n\n05.03.2024\n");
 
             assertTrue(LabelledValueExtractor.within("Data emiterii", ValuePatterns.date(), 1)
-                    .extract(text).isEmpty());
+                    .extractValue(text).isEmpty());
         }
 
         @Test
@@ -58,7 +58,7 @@ class ExtractionStrategiesTest {
 
             assertEquals(Optional.of("1.190,00"),
                     LabelledValueExtractor.sameLine("Total" + ValuePatterns.SEPARATOR,
-                            ValuePatterns.amount()).extract(text));
+                            ValuePatterns.amount()).extractValue(text));
         }
     }
 
@@ -76,7 +76,7 @@ class ExtractionStrategiesTest {
                     """);
 
             assertEquals(Optional.of("16.065,00"),
-                    ValueShapeExtractor.largest(ValuePatterns.amount()).extract(text));
+                    ValueShapeExtractor.largest(ValuePatterns.amount()).extractValue(text));
         }
 
         @Test
@@ -87,7 +87,7 @@ class ExtractionStrategiesTest {
             FieldExtractor gated = new ContextGatedExtractor(
                     ValueShapeExtractor.largest(ValuePatterns.amount()), "\\btotal\\b");
 
-            assertTrue(gated.extract(notAnInvoice).isEmpty());
+            assertTrue(gated.extractValue(notAnInvoice).isEmpty());
         }
     }
 
@@ -117,14 +117,14 @@ class ExtractionStrategiesTest {
             FieldExtractor scoped = RegionScopedExtractor.inSupplierBlock(
                     ValueShapeExtractor.first(ValuePatterns.prefixedFiscalCode()));
 
-            assertEquals(Optional.of("RO 6660002"), scoped.extract(BUYER_FIRST));
+            assertEquals(Optional.of("RO 6660002"), scoped.extractValue(BUYER_FIRST));
         }
 
         @Test
         @DisplayName("without scoping the first code on the page wins, which is the buyer's")
         void withoutScopingTheBuyerWins() {
             assertEquals(Optional.of("RO 5550001"),
-                    ValueShapeExtractor.first(ValuePatterns.prefixedFiscalCode()).extract(BUYER_FIRST));
+                    ValueShapeExtractor.first(ValuePatterns.prefixedFiscalCode()).extractValue(BUYER_FIRST));
         }
     }
 
@@ -140,7 +140,7 @@ class ExtractionStrategiesTest {
                     Str. Sanatatii 8, Timisoara
                     """);
 
-            assertEquals(Optional.of("SC SIGMA MEDICAL SRL"), new CompanyNameExtractor().extract(text));
+            assertEquals(Optional.of("SC SIGMA MEDICAL SRL"), new CompanyNameExtractor().extractValue(text));
         }
 
         @Test
@@ -148,7 +148,7 @@ class ExtractionStrategiesTest {
         void stripsTheLabel() {
             SearchText text = SearchText.of("Furnizor: SC ALFA CONSTRUCT SRL\n");
 
-            assertEquals(Optional.of("SC ALFA CONSTRUCT SRL"), new CompanyNameExtractor().extract(text));
+            assertEquals(Optional.of("SC ALFA CONSTRUCT SRL"), new CompanyNameExtractor().extractValue(text));
         }
 
         @Test
@@ -159,7 +159,7 @@ class ExtractionStrategiesTest {
                     SC ALFA CONSTRUCT SRL
                     """);
 
-            assertEquals(Optional.of("SC ALFA CONSTRUCT SRL"), new CompanyNameExtractor().extract(text));
+            assertEquals(Optional.of("SC ALFA CONSTRUCT SRL"), new CompanyNameExtractor().extractValue(text));
         }
     }
 
@@ -185,6 +185,59 @@ class ExtractionStrategiesTest {
         void leavesMixedRunsAlone() {
             assertEquals("AB123", OcrDigits.repairNumericRuns("AB123"));
             assertEquals("SB-100", OcrDigits.repairNumericRuns("SB-100"));
+        }
+    }
+
+    @Nested
+    @DisplayName("Reading a table by its columns")
+    class Columns {
+
+        private static final SearchText HEADINGS = SearchText.of("""
+                Nr. factura     Data emiterii     Termen de plata
+                GML-7781        02.02.2024        02.03.2024
+                """);
+
+        @Test
+        @DisplayName("a heading takes the value in its own column, not the first one below it")
+        void followsTheColumn() {
+            assertEquals(Optional.of("02.03.2024"),
+                    LabelledValueExtractor.within("Termen de plata" + ValuePatterns.SEPARATOR,
+                            ValuePatterns.date(), 2).extractValue(HEADINGS));
+        }
+
+        @Test
+        @DisplayName("each heading on the row finds its own value")
+        void readsEveryColumn() {
+            assertEquals(Optional.of("02.02.2024"),
+                    LabelledValueExtractor.within("Data emiterii" + ValuePatterns.SEPARATOR,
+                            ValuePatterns.date(), 2).extractValue(HEADINGS));
+        }
+
+        @Test
+        @DisplayName("a value on the label's own line still wins over any column below")
+        void prefersTheOwnLine() {
+            SearchText text = SearchText.of("""
+                    Data facturii: 05.03.2024   Termen
+                    01.01.2020
+                    """);
+
+            assertEquals(Optional.of("05.03.2024"),
+                    LabelledValueExtractor.within("Data facturii" + ValuePatterns.SEPARATOR,
+                            ValuePatterns.date(), 2).extractValue(text));
+        }
+
+        @Test
+        @DisplayName("a nearer line beats a better-aligned column further away")
+        void prefersTheNearerLine() {
+            SearchText text = SearchText.of("""
+                    Data emiterii
+                        05.03.2024
+                    01.01.2020
+                    """);
+
+            assertEquals(Optional.of("05.03.2024"),
+                    LabelledValueExtractor.within("Data emiterii", ValuePatterns.date(), 2)
+                            .extractValue(text));
         }
     }
 }

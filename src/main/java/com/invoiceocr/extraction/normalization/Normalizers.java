@@ -44,6 +44,21 @@ public final class Normalizers {
         return text().andThen(new FiscalCodeNormalizer());
     }
 
+    /** Bank accounts, rendered in the grouped IBAN form. */
+    public static ValueNormalizer iban() {
+        return text().andThen(new IbanNormalizer());
+    }
+
+    /** Currencies, rendered as an ISO 4217 code. */
+    public static ValueNormalizer currency() {
+        return text().andThen(new CurrencyNormalizer());
+    }
+
+    /** Trade-register numbers, rendered as {@code J40/1122/2015}. */
+    public static ValueNormalizer registrationNumber() {
+        return text().andThen(new RegistrationNumberNormalizer());
+    }
+
     private Normalizers() {
         throw new AssertionError("No instances");
     }

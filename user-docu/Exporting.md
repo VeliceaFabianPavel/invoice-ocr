@@ -32,21 +32,26 @@ If the file already exists, you are asked before it is replaced.
 
 | Format | Extension | Contains | Best for |
 |---|---|---|---|
-| **PDF document** | `.pdf` | Fields and raw text | Filing, printing, sending to someone |
-| **Plain text** | `.txt` | Fields and raw text | Pasting into an e-mail or a note |
-| **Markdown** | `.md` | Fields and raw text | Notes, wikis, issue trackers |
-| **HTML page** | `.html` | Fields and raw text | Opening in a browser, sharing a link |
-| **JSON data** | `.json` | Fields only | Importing into another program |
-| **XML data** | `.xml` | Fields only | Accounting software, data exchange |
-| **CSV spreadsheet** | `.csv` | Fields only | Excel, LibreOffice, a running ledger |
+| **PDF document** | `.pdf` | Fields, goods table, raw text | Filing, printing, sending to someone |
+| **Plain text** | `.txt` | Fields, goods table, raw text | Pasting into an e-mail or a note |
+| **Markdown** | `.md` | Fields, goods table, raw text | Notes, wikis, issue trackers |
+| **HTML page** | `.html` | Fields, goods table, raw text | Opening in a browser, sharing a link |
+| **JSON data** | `.json` | Fields, goods table, how sure each value is | Importing into another program |
+| **XML data** | `.xml` | Fields, goods table, how sure each value is | Accounting software, data exchange |
+| **CSV spreadsheet** | `.csv` | Fields only, one row per invoice | Excel, LibreOffice, a running ledger |
 
 The split is deliberate:
 
-- **Readable formats** — PDF, TXT, Markdown, HTML — carry the six fields *and*
-  the raw OCR text, because a person reading the file later may need to check
-  what the recognition engine actually saw.
-- **Data formats** — JSON, XML, CSV — carry the fields alone, because a program
-  reading them wants a clean record and nothing else.
+- **Readable formats** — PDF, TXT, Markdown, HTML — carry the twelve fields
+  *and* the raw OCR text, because a person reading the file later may need to
+  check what the recognition engine actually saw. Values that were worked out
+  rather than read carry the same **(?)** mark you see on screen.
+- **Data formats** — JSON, XML — carry the fields, the table and a number saying
+  how sure the application is of each value, because a program importing them
+  can decide for itself what to accept.
+- **CSV is the exception**, deliberately: one header row and one value row, so
+  that several exported invoices stack into one spreadsheet. Confidence columns
+  or a variable number of table rows would destroy that, so it has neither.
 
 ---
 
@@ -54,9 +59,9 @@ The split is deliberate:
 
 ### PDF
 
-An A4 document: the six fields, the count of how many were recognised, and the
-raw OCR text underneath in a fixed-width font. Long invoices continue onto
-further pages, each numbered.
+An A4 document: the twelve fields, the goods table, the count of how many fields
+were recognised, and the raw OCR text underneath in a fixed-width font. Long
+invoices continue onto further pages, each numbered.
 
 The text is real text, not a picture, so it can be searched and copied in any
 PDF reader.
@@ -71,48 +76,96 @@ PDF reader.
 A header row of field names and one row of values:
 
 ```
-supplier,invoiceNumber,issueDate,fiscalCode,vatAmount,totalAmount
-SC EXEMPLU DISTRIBUTIE SRL,FCT-2024/0182,05.03.2024,RO12345678,190.00,1190.00
+supplier,buyer,invoiceNumber,issueDate,dueDate,fiscalCode,registrationNumber,iban,netAmount,vatAmount,totalAmount,currency
+SC EXEMPLU DISTRIBUTIE SRL,,FCT-2024/0182,05.03.2024,,RO12345674,,,1000.00,190.00,1190.00,RON
 ```
 
 Because the header is always the same, several exported invoices stack into one
 spreadsheet: paste each new row under the last. A field that was not found is
 an empty cell.
 
+Version 1.2 added six columns — buyer, due date, register number, IBAN, net
+amount and currency — and changed nothing else about this format. A sheet built
+from 1.1 exports needs the six new headers adding; the six original columns are
+in the same order and mean the same thing.
+
 ### JSON
 
 ```json
 {
-  "supplier": "SC EXEMPLU DISTRIBUTIE SRL",
-  "invoiceNumber": "FCT-2024/0182",
-  "issueDate": "05.03.2024",
-  "fiscalCode": "RO12345678",
-  "vatAmount": "190.00",
-  "totalAmount": "1190.00"
+  "fields": {
+    "supplier": "SC EXEMPLU DISTRIBUTIE SRL",
+    "invoiceNumber": "FCT-2024/0182",
+    "issueDate": "05.03.2024",
+    "fiscalCode": "RO12345674",
+    "netAmount": "1000.00",
+    "vatAmount": "190.00",
+    "totalAmount": "1190.00",
+    "iban": null
+  },
+  "confidence": {
+    "supplier": 0.90,
+    "vatAmount": 0.70
+  },
+  "lineItems": [
+    {
+      "description": "Ciment Portland",
+      "quantity": "10",
+      "unitPrice": "32.00",
+      "value": "320.00"
+    }
+  ],
+  "summary": {
+    "recognized": 10,
+    "fields": 12,
+    "averageConfidence": 0.87,
+    "needsReview": ["vatAmount"]
+  }
 }
 ```
 
-A field that was not found is `null`, never a missing key, so the shape of the
-object is the same every time.
+A field that was not found is `null`, never a missing key, so the shape of
+`fields` is the same every time.
+
+`confidence` gives each value a number between 0 and 1 saying how sure the
+application is of it: `1.00` means it was verified — a checksum that adds up, or
+an amount confirmed by the other two — and anything under `0.60` also appears in
+`needsReview`. See [How It Reads](How-It-Reads.md).
+
+> **This shape changed in 1.2.** Version 1.1 put the field keys at the top level
+> of the document. If you have a program reading these files, point it at
+> `fields` instead of the root object; nothing inside `fields` changed.
 
 ### XML
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
-<invoice recognized="6" fields="6">
-  <field key="supplier" found="true">SC EXEMPLU DISTRIBUTIE SRL</field>
-  <field key="totalAmount" found="true">1190.00</field>
+<invoice recognized="10" fields="12" averageConfidence="0.87">
+  <field key="supplier" found="true" confidence="1.00"
+         strategy="labelled+checked" review="false">SC EXEMPLU DISTRIBUTIE SRL</field>
+  <field key="totalAmount" found="true" confidence="1.00"
+         strategy="arithmetic-confirmed" review="false">1190.00</field>
+  <field key="iban" found="false"></field>
+  <lineItems count="1">
+    <item quantity="10" unitPrice="32.00" value="320.00">Ciment Portland</item>
+  </lineItems>
 </invoice>
 ```
 
 The `found` attribute distinguishes "not printed on the invoice" from "read as
-an empty value".
+an empty value". `confidence` and `review` say how much to trust the value, and
+`strategy` says how it was arrived at.
+
+Everything 1.2 added here is an extra attribute or an extra element, so a program
+written against the 1.1 format keeps working unchanged.
 
 ### Markdown and HTML
 
-Both render the fields as a table and the raw OCR text below it. The HTML file
-is self-contained — the styling is inside the file — so it can be e-mailed or
-archived on its own and still look right.
+Both render the fields as a table, the goods table beneath it, and the raw OCR
+text below that. Values that were worked out carry the **(?)** mark, with a note
+explaining it. The HTML file is self-contained — the styling is inside the file —
+so it can be e-mailed or archived on its own and still look right; hovering over
+a value shows how it was found.
 
 ---
 
@@ -124,11 +177,20 @@ means the same thing whatever language the interface is set to:
 | Interface label | Key in JSON, XML and CSV |
 |---|---|
 | Furnizor | `supplier` |
+| Cumparator | `buyer` |
 | Serie / Numar | `invoiceNumber` |
 | Data emiterii | `issueDate` |
+| Data scadentei | `dueDate` |
 | CUI / CIF | `fiscalCode` |
+| Reg. Comertului | `registrationNumber` |
+| Cont bancar (IBAN) | `iban` |
+| Total fara TVA | `netAmount` |
 | TVA | `vatAmount` |
 | Total de plata | `totalAmount` |
+| Moneda | `currency` |
+
+The rows of the goods table use `description`, `quantity`, `unitPrice` and
+`value` in JSON, and the same names as attributes in XML.
 
 ---
 
@@ -148,6 +210,8 @@ The save dialog starts on PDF. To change that, set
   `1190.00`, dates as `05.03.2024`.
 - Fields shown as `N/A` are exported as empty (CSV, XML), `null` (JSON) or
   `N/A` (readable formats).
+- Table columns the invoice did not print behave the same way, so an absent
+  quantity is `null` rather than `0`.
 - If writing fails — a full disk, a read-only folder, a disconnected network
   drive — an existing file of the same name is left untouched. See
   [Troubleshooting](Troubleshooting.md#could-not-write-the-file).

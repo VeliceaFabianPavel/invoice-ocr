@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -37,6 +39,10 @@
 <h1 id="glossary">Glossary</h1>
 <p>Terms you will meet in this guide, in the application, and in its error messages.</p>
 <hr>
+<h3 id="">(?)</h3>
+<p>The mark beside a value the application worked out or guessed rather than read from its own label. It is the application saying which figures are worth a glance at the raw panel. See <a href="How-It-Reads.html#it-tells-you-what-to-check">How It Reads</a>.</p>
+<h3 id="checksum-control-digit">Checksum / control digit</h3>
+<p>An extra digit computed from the others, so that a number can be checked against itself. Romanian fiscal codes carry one; every IBAN carries one. It is what lets the application tell a code it read correctly from one it did not. See <a href="How-It-Reads.html#it-checks-what-it-read">How It Reads</a>.</p>
 <h3 id="cui-cif">CUI / CIF</h3>
 <p><em>Cod Unic de Înregistrare</em> / <em>Cod de Identificare Fiscală</em> — the Romanian fiscal identification code of a company, often printed with an <code>RO</code> prefix for VAT-registered businesses. The application shows it as <code>RO12345678</code>.</p>
 <h3 id="dpi-dots-per-inch">dpi (dots per inch)</h3>
@@ -51,20 +57,28 @@
 <p>The single file the whole application is packaged in — <code>invoice-ocr.jar</code>. Run it by double-clicking, or with <code>java -jar invoice-ocr.jar</code>.</p>
 <h3 id="java">Java</h3>
 <p>The runtime the application needs. Version 17 or newer. Check with <code>java -version</code>.</p>
+<h3 id="line-item">Line item</h3>
+<p>One row of the goods table — what was sold, how much of it, at what price. Read since version 1.2. See <a href="Line-Items.html">Line Items</a>.</p>
 <h3 id="na">N/A</h3>
 <p>Shown instead of a value when a field could not be found. The application marks it as unknown rather than guessing. See <a href="Getting-Started.html#when-fields-show-na">When fields show N/A</a>.</p>
+<h3 id="net-amount">Net amount</h3>
+<p>The invoice total before VAT is added — <code>Total fara TVA</code> on a Romanian invoice. The application reads it, or works it out, since net + VAT = total.</p>
 <h3 id="normalisation">Normalisation</h3>
 <p>Rewriting a recognised value into one consistent form: <code>1.190,00</code> and <code>1,190.00</code> both become <code>1190.00</code>. See <a href="Extracted-Fields.html#how-values-are-cleaned-up">How values are cleaned up</a>.</p>
 <h3 id="ocr-optical-character-recognition">OCR (Optical Character Recognition)</h3>
 <p>Turning a picture of text into text a computer can process. It is the core of what this application does, and it is never perfect — which is why the raw text is always shown next to the results.</p>
 <h3 id="page-segmentation-mode-psm">Page segmentation mode (PSM)</h3>
 <p>How the engine divides a page into blocks of text before reading them. Setting <code>ocr.pageSegmentationMode</code>. See <a href="Settings.html#page-segmentation-mode">Settings</a>.</p>
+<h3 id="pass">Pass</h3>
+<p>One reading of the page: one preparation of the picture, one assumption about the layout. The application makes up to four and compares the answers. See <a href="Settings.html#how-many-times-a-page-is-read">Settings</a>.</p>
 <h3 id="preprocessing">Preprocessing</h3>
-<p>The automatic preparation applied to your image before recognition: enlarging small scans and converting to greyscale. See <a href="Preparing-Invoices.html#what-the-application-does-for-you">What the application does for you</a>.</p>
+<p>The automatic preparation applied to your image before recognition: enlarging small scans, converting to greyscale and — since version 1.2 — straightening, stretching the contrast, converting to black and white and sharpening, each on a different attempt. See <a href="Preparing-Invoices.html#what-the-application-does-for-you">What the application does for you</a>.</p>
 <h3 id="properties-file">Properties file</h3>
 <p>A plain-text settings file with one <code>name=value</code> per line. Yours is <code>invoice-ocr.properties</code>, next to the jar. See <a href="Settings.html#where-settings-live">Settings</a>.</p>
 <h3 id="raw-text">Raw text</h3>
 <p>The unmodified output of the recognition engine, shown in the left panel. Your evidence when a result looks wrong.</p>
+<h3 id="skew">Skew</h3>
+<p>The angle a page ended up at when it was scanned or photographed. Even two or three degrees costs accuracy, because slightly slanted lines of text get merged with their neighbours. The application measures it and straightens the page. See <a href="How-It-Reads.html#it-reads-the-page-several-times">How It Reads</a>.</p>
 <h3 id="tesseract">Tesseract</h3>
 <p>The open-source recognition engine the application uses internally. You do not interact with it directly; you only need to supply its language data.</p>
 <h3 id="tessdata">tessdata</h3>
@@ -72,7 +86,7 @@
 <h3 id="traineddata-traineddata">traineddata (<code>*.traineddata</code>)</h3>
 <p>One file per language, for example <code>ron.traineddata</code> for Romanian, telling the engine what that language's characters and words look like.</p>
 <h3 id="tva">TVA</h3>
-<p><em>Taxa pe Valoarea Adăugată</em> — Romanian value-added tax (VAT). The application extracts the VAT <strong>amount</strong>, not the rate: from <code>Total TVA 19% 190,00</code> it takes <code>190.00</code>.</p>
+<p><em>Taxa pe Valoarea Adăugată</em> — Romanian value-added tax (VAT). The application extracts the VAT <strong>amount</strong>, not the rate: from <code>Total TVA 19% 190,00</code> it takes <code>190.00</code>. It also checks it: net + VAT has to equal the total.</p>
 <hr>
 <p><strong>See also:</strong> <a href="FAQ.html">FAQ</a> · <a href="Settings.html">Settings</a></p>
 </article>

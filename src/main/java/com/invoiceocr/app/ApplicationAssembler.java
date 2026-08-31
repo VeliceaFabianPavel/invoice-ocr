@@ -5,15 +5,22 @@ import com.invoiceocr.concurrent.TaskExecutor;
 import com.invoiceocr.config.ChainedConfigurationSource;
 import com.invoiceocr.config.ConfigurationBackedExportSettings;
 import com.invoiceocr.config.ConfigurationBackedOcrSettings;
+import com.invoiceocr.config.ConfigurationBackedReportSettings;
 import com.invoiceocr.config.ConfigurationSource;
 import com.invoiceocr.config.ExportSettings;
 import com.invoiceocr.config.EnvironmentConfigurationSource;
 import com.invoiceocr.config.LocaleProvider;
 import com.invoiceocr.config.OcrSettings;
 import com.invoiceocr.config.PropertiesConfigurationSource;
+import com.invoiceocr.config.ReportSettings;
 import com.invoiceocr.config.SystemPropertiesConfigurationSource;
 import com.invoiceocr.extraction.InvoiceParser;
+import com.invoiceocr.extraction.InvoiceRefinement;
 import com.invoiceocr.extraction.RuleBasedInvoiceParser;
+import com.invoiceocr.extraction.items.LineItemRefinement;
+import com.invoiceocr.extraction.items.TableLineItemExtractor;
+import com.invoiceocr.extraction.validation.ArithmeticRefinement;
+import com.invoiceocr.extraction.validation.DateRefinement;
 import com.invoiceocr.export.DefaultInvoiceExportService;
 import com.invoiceocr.export.ExportFormats;
 import com.invoiceocr.export.InvoiceExportService;
@@ -31,17 +38,15 @@ import com.invoiceocr.format.RawTextAppendingFormatter;
 import com.invoiceocr.format.XmlInvoiceReportFormatter;
 import com.invoiceocr.i18n.MessageSource;
 import com.invoiceocr.i18n.ResourceBundleMessageSource;
-import com.invoiceocr.image.CompositeImagePreprocessor;
 import com.invoiceocr.image.DocumentLoader;
-import com.invoiceocr.image.GrayscalePreprocessor;
 import com.invoiceocr.image.ImageIoDocumentLoader;
-import com.invoiceocr.image.ImagePreprocessor;
-import com.invoiceocr.image.UpscalePreprocessor;
 import com.invoiceocr.ocr.OcrEngineFactory;
 import com.invoiceocr.ocr.tesseract.TesseractOcrEngineFactory;
 import com.invoiceocr.presentation.InvoicePresenter;
-import com.invoiceocr.service.DefaultInvoiceRecognitionService;
+import com.invoiceocr.recognition.InvoiceDataMerger;
+import com.invoiceocr.recognition.RecognitionPlan;
 import com.invoiceocr.service.InvoiceRecognitionService;
+import com.invoiceocr.service.MultiPassInvoiceRecognitionService;
 import com.invoiceocr.ui.DocumentChooser;
 import com.invoiceocr.ui.ExportChooser;
 import com.invoiceocr.ui.InvoiceView;
@@ -51,6 +56,7 @@ import com.invoiceocr.ui.swing.SwingExportChooser;
 import com.invoiceocr.ui.swing.SwingInvoiceView;
 import com.invoiceocr.ui.swing.SwingUserNotifier;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -74,16 +80,13 @@ public class ApplicationAssembler {
     public InvoiceView assemble() {
         ConfigurationSource configuration = configurationSource();
         OcrSettings settings = new ConfigurationBackedOcrSettings(configuration);
+        ReportSettings reportSettings = new ConfigurationBackedReportSettings(configuration);
         Locale locale = LocaleProvider.fromConfiguration(configuration).locale();
         MessageSource messages = messageSource(locale);
 
-        InvoiceRecognitionService service = new DefaultInvoiceRecognitionService(
-                documentLoader(settings),
-                imagePreprocessor(settings),
-                ocrEngineFactory(settings),
-                invoiceParser());
+        InvoiceRecognitionService service = recognitionService(settings);
 
-        InvoiceExportService exportService = exportService(messages);
+        InvoiceExportService exportService = exportService(messages, reportSettings);
         ExportSettings exportSettings = new ConfigurationBackedExportSettings(configuration);
 
         SwingInvoiceView view = new SwingInvoiceView(messages);
@@ -94,7 +97,8 @@ public class ApplicationAssembler {
 
         view.addListener(new InvoicePresenter(
                 view, chooser, exportChooser, service, exportService,
-                reportFormatter(messages), taskExecutor(), notifier, messages, exportSettings));
+                reportFormatter(messages, reportSettings), taskExecutor(), notifier,
+                messages, exportSettings));
         return view;
     }
 
@@ -119,25 +123,52 @@ public class ApplicationAssembler {
         return new ImageIoDocumentLoader(settings);
     }
 
-    protected ImagePreprocessor imagePreprocessor(OcrSettings settings) {
-        if (!settings.preprocessingEnabled()) {
-            return ImagePreprocessor.identity();
-        }
-        return CompositeImagePreprocessor.of(
-                new UpscalePreprocessor(settings.minimumWidth()),
-                new GrayscalePreprocessor());
-    }
-
     protected OcrEngineFactory ocrEngineFactory(OcrSettings settings) {
         return new TesseractOcrEngineFactory(settings);
     }
 
-    protected InvoiceParser invoiceParser() {
-        return new RuleBasedInvoiceParser(new RomanianInvoiceRuleProvider());
+    /**
+     * The pipeline: decode once, then read the page as many times as it takes.
+     *
+     * <p>The image is loaded a single time and each pass prepares its own copy,
+     * so a second reading costs one OCR call rather than a second decode. The
+     * merge that follows runs the refinements again over the combined fields,
+     * because a total from one pass beside a net amount from another is a pair
+     * neither pass ever saw.</p>
+     */
+    protected InvoiceRecognitionService recognitionService(OcrSettings settings) {
+        return new MultiPassInvoiceRecognitionService(
+                documentLoader(settings),
+                ocrEngineFactory(settings),
+                invoiceParser(settings),
+                RecognitionPlan.forSettings(settings),
+                new InvoiceDataMerger(refinements(settings)),
+                settings.targetConfidence());
     }
 
-    protected InvoiceReportFormatter reportFormatter(MessageSource messages) {
-        return new PlainTextInvoiceReportFormatter(messages);
+    protected InvoiceParser invoiceParser(OcrSettings settings) {
+        return new RuleBasedInvoiceParser(new RomanianInvoiceRuleProvider(), refinements(settings));
+    }
+
+    /**
+     * The post-parse passes, in the order they have to run.
+     *
+     * <p>The table comes first because it can supply a net amount, the dates
+     * next because they depend on nothing else, and the arithmetic last because
+     * it is the one that has to see everything the others produced.</p>
+     */
+    protected List<InvoiceRefinement> refinements(OcrSettings settings) {
+        List<InvoiceRefinement> refinements = new ArrayList<>(3);
+        if (settings.lineItemsEnabled()) {
+            refinements.add(new LineItemRefinement(new TableLineItemExtractor()));
+        }
+        refinements.add(new DateRefinement());
+        refinements.add(new ArithmeticRefinement());
+        return List.copyOf(refinements);
+    }
+
+    protected InvoiceReportFormatter reportFormatter(MessageSource messages, ReportSettings settings) {
+        return new PlainTextInvoiceReportFormatter(messages, settings);
     }
 
     /**
@@ -147,9 +178,9 @@ public class ApplicationAssembler {
      * formats carry the fields alone, so a machine reading them gets a clean
      * record. The order here is the order the save dialog offers.</p>
      */
-    protected InvoiceExportService exportService(MessageSource messages) {
-        InvoiceReportFormatter plainText =
-                new RawTextAppendingFormatter(new PlainTextInvoiceReportFormatter(messages), messages);
+    protected InvoiceExportService exportService(MessageSource messages, ReportSettings settings) {
+        InvoiceReportFormatter plainText = new RawTextAppendingFormatter(
+                new PlainTextInvoiceReportFormatter(messages, settings), messages);
 
         List<InvoiceExporter> exporters = List.of(
                 new PdfInvoiceExporter(messages),

@@ -65,19 +65,29 @@ Sometimes a phone is all you have. In that case:
 
 ## What the application does for you
 
-Before recognition, two automatic corrections are applied:
+Quite a lot more than it used to. Every reading enlarges small images (at most
+4×, because characters below a certain size cannot be recognised at all) and
+removes colour, which makes the text stand out from the background. Then, if
+that reading was not good enough, it tries again with the picture prepared
+differently:
 
-1. **Enlargement** — images narrower than 1000 pixels are scaled up (at most
-   4×), because characters below a certain size cannot be recognised at all.
-2. **Greyscale conversion** — colour is removed, which makes the text/background
-   separation more reliable.
+| Attempt | Also does |
+|---|---|
+| 1 | nothing more — enough for a clean scan |
+| 2 | **straightens** a tilted page and **stretches the contrast** of a faded one |
+| 3 | converts to **black and white**, judging each part of the page against its own surroundings — which is what rescues uneven lighting |
+| 4 | **sharpens** softened characters |
 
-Both are on by default and can be turned off in
+So a photograph taken at three degrees, or a page with a desk lamp on one side,
+is now largely handled for you. See [How It Reads](How-It-Reads.md).
+
+All of it is on by default and can be turned off in
 [Settings](Settings.md#image-preparation), though there is rarely a reason to.
 
-Note what this does **not** include: the application does not straighten a
-tilted page, remove shadows or sharpen a blurred photo. Those must be right
-before you load the file.
+Note what this still does **not** include: the application will not turn a page
+the right way up, un-blur a photograph that was out of focus, or recover text
+under a stamp. And straightening handles a tilt of a few degrees, not a page
+scanned sideways. Everything below still helps.
 
 ---
 
@@ -87,13 +97,14 @@ Before blaming the application, confirm:
 
 - [ ] The image is at least ~1000 pixels wide (a 300 dpi A4 scan is ~2480).
 - [ ] Text is sharp when you zoom to 100 % in an image viewer.
-- [ ] The page is straight, not rotated or upside down.
+- [ ] The page is the right way up. A few degrees of tilt is corrected for you;
+      a page scanned sideways is not.
 - [ ] The whole invoice is visible, including the totals block.
 - [ ] There are no large shadows or glare spots across the text.
 - [ ] The recognition language matches the invoice —
       [`ocr.language`](Settings.md#recognition-language).
 
-If all six hold and results are still poor, the left-hand raw panel will show
+If all of these hold and results are still poor, the left-hand raw panel will show
 you what the engine actually saw, and
 [Troubleshooting](Troubleshooting.md#poor-or-wrong-results) covers what to change
 next.

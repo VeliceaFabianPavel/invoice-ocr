@@ -43,11 +43,16 @@ Environment variables use the same name in capitals with underscores:
 |---|---|---|
 | `ocr.tessdata.path` | `C:/Program Files/Tesseract-OCR/tessdata` | Folder holding the `*.traineddata` language files. **The one setting you must get right.** |
 | `ocr.language` | `eng` | Which language(s) to recognise. Combine with `+` |
-| `ocr.pageSegmentationMode` | `3` | How the page is divided into text blocks |
+| `ocr.pageSegmentationMode` | `3` | How the page is divided into text blocks, for the first reading |
 | `ocr.engineMode` | `3` | Which recognition engine variant to use |
+| `ocr.passes.maximum` | `4` | How many times a page may be read before the answers are compared |
+| `ocr.passes.targetConfidence` | `0.80` | How sure a reading has to be before the application stops trying |
 | `document.supportedExtensions` | `png,jpg,jpeg,bmp,tif,tiff,gif` | Formats offered in the file dialog |
 | `image.preprocessing.enabled` | `true` | Whether images are prepared before recognition |
 | `image.preprocessing.minimumWidth` | `1000` | Images narrower than this are enlarged |
+| `extraction.lineItems.enabled` | `true` | Whether the rows of the goods table are read |
+| `report.showConfidence` | `true` | Whether values that were worked out are marked **(?)** |
+| `report.lineItems` | `true` | Whether reports include the table rows |
 | `export.defaultFormat` | `pdf` | Format the export dialog opens on |
 | `ui.locale` | `ro` | Interface language: `ro` or `en` |
 
@@ -74,10 +79,72 @@ what it found instead — see
 
 ---
 
+## How many times a page is read
+
+New in 1.2. The application reads each page up to four times, preparing the
+picture differently each time, and compares the answers — see
+[How It Reads](How-It-Reads.md). Two settings control it:
+
+```properties
+ocr.passes.maximum=4
+ocr.passes.targetConfidence=0.80
+```
+
+`ocr.passes.maximum` is the ceiling, not a quota. Reading stops as soon as one
+attempt is good enough, so a clean scan costs a single pass whatever this is set
+to. It only matters for pages that are *not* read well the first time.
+
+| Value | Effect |
+|---|---|
+| `4` *(default)* | The full ladder: plain, straightened, black-and-white, sharpened |
+| `2` | Plain and straightened only — helps photographs, skips the expensive passes |
+| `1` | One reading, exactly as version 1.1 behaved |
+
+`ocr.passes.targetConfidence` is the bar an attempt has to clear. Raise it to
+`0.95` and the application will work harder on awkward scans; lower it to `0.5`
+and it will accept the first reading more readily.
+
+```properties
+# A scanner producing clean pages, and speed matters
+ocr.passes.maximum=1
+
+# Photographs from a phone, and accuracy matters more than seconds
+ocr.passes.targetConfidence=0.95
+```
+
+Setting `image.preprocessing.enabled=false` overrides both: the picture is passed
+through untouched, once.
+
+---
+
+## The goods table and the report marks
+
+```properties
+extraction.lineItems.enabled=true
+report.showConfidence=true
+report.lineItems=true
+```
+
+`extraction.lineItems.enabled=false` stops the application reading the product
+rows at all. `report.lineItems=false` keeps reading them — so they still help
+check the net amount — but leaves them out of the report and the exports.
+
+`report.showConfidence=false` removes the **(?)** marks and the note that
+explains them. The status bar still counts what would have been marked. Leave
+this on unless the marks are getting in the way of a downstream process; they are
+the only signal telling you which figures were worked out rather than read.
+
+See [Line Items](Line-Items.md).
+
+---
+
 ## Page segmentation mode
 
-`ocr.pageSegmentationMode` tells the engine how the page is laid out. Only a few
-values are worth trying:
+`ocr.pageSegmentationMode` tells the engine how the page is laid out. It applies
+to the **first** reading; the later passes try other layouts of their own, which
+is part of what makes them worth running.
+
+Only a few values are worth trying:
 
 | Value | Meaning | When to use |
 |---|---|---|
@@ -127,9 +194,12 @@ image.preprocessing.minimumWidth=1000
 ```
 
 With preparation enabled, small images are enlarged (up to 4×) and everything is
-converted to greyscale before recognition. Setting `minimumWidth=0` keeps
-greyscale conversion but disables enlargement. Setting `enabled=false` passes
-your image through untouched, which is only sensible if you pre-process scans
+converted to greyscale before recognition — and, on the later passes,
+straightened, contrast-stretched, converted to black and white or sharpened.
+Setting `minimumWidth=0` keeps the rest but disables enlargement.
+
+Setting `enabled=false` passes your image through untouched **and collapses the
+ladder to a single reading**, which is only sensible if you pre-process scans
 yourself.
 
 ---

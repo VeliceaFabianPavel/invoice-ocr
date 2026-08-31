@@ -61,25 +61,43 @@ usually see that the engine misread a character, rather than the application
 mis-assigning a value.
 
 **Right — Date extrase (structurat)** (*Extracted data, structured*)
-The six fields, cleaned up and normalised:
+The twelve fields, cleaned up and normalised, with the goods table beneath them:
 
 ```
 ==============================================
 DATE FACTURA
 ==============================================
 
-Furnizor       : SC EXEMPLU DISTRIBUTIE SRL
-Serie / Numar  : FCT-2024/0182
-Data emiterii  : 05.03.2024
-CUI / CIF      : RO12345678
-TVA            : 190.00
-Total de plata : 1190.00
+Furnizor            : SC EXEMPLU DISTRIBUTIE SRL
+Cumparator          : N/A
+Serie / Numar       : FCT-2024/0182
+Data emiterii       : 05.03.2024
+Data scadentei      : N/A
+CUI / CIF           : RO12345674
+Reg. Comertului     : N/A
+Cont bancar (IBAN)  : N/A
+Total fara TVA      : 1000.00
+TVA                 : 190.00
+Total de plata      : 1190.00
+Moneda              : RON (?)
 
-Campuri identificate: 6 din 6
+----------------------------------------------
+Articole
+----------------------------------------------
+Denumire                  Cant  Pret unitar     Valoare
+Servicii consultanta IT      1      700.00      700.00
+Licenta software anuala      1      300.00      300.00
+
+Campuri identificate: 8 din 12
 ```
 
-The status bar confirms the same thing: `factura-exemplu.png: 6 campuri
-identificate` (*6 fields identified*).
+The status bar confirms the same thing: `factura-exemplu.png: 8 campuri
+identificate, 1 de verificat` (*8 fields identified, 1 to check*).
+
+Notice the **(?)** beside the currency. It marks a value the application worked
+out rather than read from its own label — see
+[How It Reads](How-It-Reads.md). Everything without a mark was read directly, or
+checked arithmetically.
 
 What each field means, and which invoice labels the application looks for, is
 explained in [Extracted Fields](Extracted-Fields.md).
@@ -116,8 +134,9 @@ step away and do not want to mistake an old result for a new one.
 ## When fields show N/A
 
 `N/A` means the application did not find that field, and it refuses to guess.
-The footer tells you how many of the six were found, for example
-`Campuri identificate: 4 din 6`.
+The footer tells you how many of the twelve were found, for example
+`Campuri identificate: 8 din 12`. A blank field is not always a failure: most
+invoices genuinely do not print a bank account or a due date.
 
 The three usual causes, in order of likelihood:
 

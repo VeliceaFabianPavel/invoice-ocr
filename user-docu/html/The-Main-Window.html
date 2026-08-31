@@ -34,6 +34,8 @@
 </ul>
 </li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -61,7 +63,7 @@
 <tr><td>Third button</td><td><strong>Goleste</strong></td><td>Clear</td><td>Empties both panels; changes nothing on disk</td></tr>
 <tr><td>Progress bar</td><td><em>(no label)</em></td><td></td><td>Visible only while an invoice is being read</td></tr>
 <tr><td>Left panel</td><td><strong>Text OCR brut</strong></td><td>Raw OCR text</td><td>What the recognition engine read, unmodified</td></tr>
-<tr><td>Right panel</td><td><strong>Date extrase (structurat)</strong></td><td>Extracted data (structured)</td><td>The six fields, cleaned up</td></tr>
+<tr><td>Right panel</td><td><strong>Date extrase (structurat)</strong></td><td>Extracted data (structured)</td><td>The twelve fields and the goods table, cleaned up</td></tr>
 <tr><td>Status bar</td><td><strong>Pregatit</strong></td><td>Ready</td><td>Current state, bottom left</td></tr>
 </tbody>
 </table>
@@ -77,7 +79,8 @@
 <tbody>
 <tr><td><code>Pregatit</code></td><td>Idle, waiting for you</td></tr>
 <tr><td><code>Se proceseaza factura.png...</code></td><td>Reading that file now</td></tr>
-<tr><td><code>factura.png: 6 campuri identificate</code></td><td>Finished; 6 of 6 fields found</td></tr>
+<tr><td><code>factura.png: 12 campuri identificate</code></td><td>Finished; all twelve fields found, and nothing needs checking</td></tr>
+<tr><td><code>factura.png: 10 campuri identificate, 2 de verificat</code></td><td>Finished; ten found, two of them worked out rather than read — see <a href="How-It-Reads.html">How It Reads</a></td></tr>
 <tr><td><code>Se exporta factura.pdf...</code></td><td>Writing an export file</td></tr>
 <tr><td><code>Exportat in factura.pdf</code></td><td>The export was written</td></tr>
 <tr><td><code>Procesare esuata pentru factura.png</code></td><td>Failed; an error dialog explains why</td></tr>
@@ -90,7 +93,9 @@
 <h3 id="left-raw-text">Left — raw text</h3>
 <p>A faithful transcript in a fixed-width font, blank lines and all. Nothing is corrected here. Use it to judge the quality of a scan: if the raw panel is garbled, no amount of configuration will produce good fields, and the answer is a better image — see <a href="Preparing-Invoices.html">Preparing Invoices</a>.</p>
 <h3 id="right-structured-data">Right — structured data</h3>
-<p>Always the same six lines in the same order, whether or not each was found, followed by a count and a reminder about <code>N/A</code>. A consistent shape means you can scan the same position every time instead of hunting.</p>
+<p>Always the same twelve lines in the same order, whether or not each was found, then the rows of the goods table, then a count and a reminder about <code>N/A</code>. A consistent shape means you can scan the same position every time instead of hunting.</p>
+<p>A value followed by <strong>(?)</strong> was worked out or guessed rather than read from its own label — the largest amount on a page that never labelled a total, say, or a VAT figure derived from the other two. It is usually right; it is simply the one to glance at the left panel about. When any value carries the mark, a short note under the count explains it.</p>
+<p>The status bar counts them for you, so you rarely have to hunt for the marks yourself.</p>
 <p>Both panels are <strong>read-only</strong>. You cannot fix a value by typing over it — and that is deliberate, so what you copy, or export, is always what the application actually read.</p>
 <hr>
 <h2 id="while-it-works">While it works</h2>

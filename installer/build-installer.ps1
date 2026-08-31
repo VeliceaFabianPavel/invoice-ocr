@@ -181,4 +181,4 @@ $output = Get-ChildItem (Join-Path $here 'invoice-ocr-setup-*.exe') |
           Sort-Object LastWriteTime -Descending | Select-Object -First 1
 Write-Host ''
 Write-Host ("Built {0} ({1:N1} MB)" -f $output.FullName, ($output.Length / 1MB)) -ForegroundColor Green
-Write-Host 'Run it as administrator, or silently with:  invoice-ocr-setup-1.1.1.exe /S' -ForegroundColor DarkGray
+Write-Host 'Run it as administrator, or silently with:  invoice-ocr-setup-1.2.0.exe /S' -ForegroundColor DarkGray

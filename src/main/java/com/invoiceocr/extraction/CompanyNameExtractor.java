@@ -1,5 +1,6 @@
 package com.invoiceocr.extraction;
 
+import com.invoiceocr.domain.FieldConfidence;
 import com.invoiceocr.extraction.text.SearchText;
 import com.invoiceocr.extraction.text.TextRegion;
 import com.invoiceocr.extraction.text.ValuePatterns;
@@ -24,6 +25,8 @@ import java.util.regex.Pattern;
  */
 public final class CompanyNameExtractor implements FieldExtractor {
 
+    private static final String NAME = "company-line";
+
     private static final Pattern LEADING_LABEL = Pattern.compile(
             "^\\s*(?:Furnizor(?:ul)?|Vanzator(?:ul)?|Emitent(?:ul)?|Prestator(?:ul)?"
                     + "|Societate(?:a)?|Denumire(?:a)?|Cumparator(?:ul)?|Client(?:ul)?|Beneficiar(?:ul)?)"
@@ -47,7 +50,7 @@ public final class CompanyNameExtractor implements FieldExtractor {
     private static final int MINIMUM_LENGTH = 4;
 
     @Override
-    public Optional<String> extract(SearchText text, TextRegion region) {
+    public Optional<Extraction> extract(SearchText text, TextRegion region) {
         String folded = text.folded();
         int at = region.start();
 
@@ -59,7 +62,7 @@ public final class CompanyNameExtractor implements FieldExtractor {
                     && !NOT_A_NAME.matcher(foldedLine).find()) {
                 String candidate = stripLabel(text.slice(at, end), foldedLine);
                 if (candidate.length() >= MINIMUM_LENGTH) {
-                    return Optional.of(candidate);
+                    return Optional.of(Extraction.of(candidate, FieldConfidence.SHAPED, NAME));
                 }
             }
             at = end + 1;

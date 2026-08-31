@@ -19,7 +19,7 @@ dialogs.
 | Third button | **Goleste** | Clear | Empties both panels; changes nothing on disk |
 | Progress bar | *(no label)* | | Visible only while an invoice is being read |
 | Left panel | **Text OCR brut** | Raw OCR text | What the recognition engine read, unmodified |
-| Right panel | **Date extrase (structurat)** | Extracted data (structured) | The six fields, cleaned up |
+| Right panel | **Date extrase (structurat)** | Extracted data (structured) | The twelve fields and the goods table, cleaned up |
 | Status bar | **Pregatit** | Ready | Current state, bottom left |
 
 ---
@@ -32,7 +32,8 @@ The bottom-left line is the fastest way to see what the application is doing.
 |---|---|
 | `Pregatit` | Idle, waiting for you |
 | `Se proceseaza factura.png...` | Reading that file now |
-| `factura.png: 6 campuri identificate` | Finished; 6 of 6 fields found |
+| `factura.png: 12 campuri identificate` | Finished; all twelve fields found, and nothing needs checking |
+| `factura.png: 10 campuri identificate, 2 de verificat` | Finished; ten found, two of them worked out rather than read — see [How It Reads](How-It-Reads.md) |
 | `Se exporta factura.pdf...` | Writing an export file |
 | `Exportat in factura.pdf` | The export was written |
 | `Procesare esuata pentru factura.png` | Failed; an error dialog explains why |
@@ -53,9 +54,19 @@ a better image — see [Preparing Invoices](Preparing-Invoices.md).
 
 ### Right — structured data
 
-Always the same six lines in the same order, whether or not each was found,
-followed by a count and a reminder about `N/A`. A consistent shape means you can
-scan the same position every time instead of hunting.
+Always the same twelve lines in the same order, whether or not each was found,
+then the rows of the goods table, then a count and a reminder about `N/A`. A
+consistent shape means you can scan the same position every time instead of
+hunting.
+
+A value followed by **(?)** was worked out or guessed rather than read from its
+own label — the largest amount on a page that never labelled a total, say, or a
+VAT figure derived from the other two. It is usually right; it is simply the one
+to glance at the left panel about. When any value carries the mark, a short note
+under the count explains it.
+
+The status bar counts them for you, so you rarely have to hunt for the marks
+yourself.
 
 Both panels are **read-only**. You cannot fix a value by typing over it — and
 that is deliberate, so what you copy, or export, is always what the application

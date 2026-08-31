@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html">Exporting</a></li>
 <li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
 <li><a href="Settings.html">Settings</a></li>
@@ -110,6 +112,15 @@
 </ul>
 <h3 id="the-total-is-wrong">The total is wrong</h3>
 <p>Usually the invoice labels its subtotal <code>Total de plata</code> and its real total something else, or an amount was misread. Check the raw panel: if it shows <code>1.190,00</code>, the extraction is right; if it shows <code>1.19O,00</code> (letter O for zero), it is a recognition problem and a better scan fixes it.</p>
+<p>Since version 1.2 the three amounts have to satisfy <strong>net + VAT = total</strong>, so a single misread figure is usually corrected for you from the other two. If all three are marked <strong>(?)</strong>, none of them could be reconciled — which is a strong hint that more than one was misread, and that the scan is the problem.</p>
+<h3 id="a-value-is-marked">A value is marked (?)</h3>
+<p>That is the application telling you it worked the value out rather than reading it from its own label. It is not an error. Compare it with the left panel; if it is right, use it. See <a href="How-It-Reads.html#it-tells-you-what-to-check">How It Reads</a>.</p>
+<h3 id="the-bank-account-is-na-but-the-invoice-shows-one">The bank account is N/A but the invoice shows one</h3>
+<p>Every IBAN carries a checksum, and the application refuses to report an account that fails it — an almost-right bank account is worse than none. Look at the raw panel: the account is usually there with one character misread, and a better scan fixes it.</p>
+<h3 id="the-fiscal-code-is-marked">The fiscal code is marked (?)</h3>
+<p>Romanian fiscal codes have a control digit, and this one did not add up. Either recognition misread a digit — check the raw panel — or the code genuinely is a foreign one, which this check does not apply to. The value is still shown, because it is usually right.</p>
+<h3 id="the-product-rows-are-missing">The product rows are missing</h3>
+<p>The goods table needs a heading row carrying both a description column (<code>Denumire</code>, <code>Produs</code>, <code>Nr. crt</code>) and a figure column (<code>Cant</code>, <code>Pret</code>, <code>Valoare</code>). Without one the application reports no rows rather than guessing at them. Check the raw panel: if the heading is garbled, a better scan fixes it; if your invoices use headings the application does not know, the rows will stay missing while the header fields are read normally. See <a href="Line-Items.html">Line Items</a>.</p>
 <h3 id="the-date-looks-odd">The date looks odd</h3>
 <p>Dates are shown as <code>dd.MM.yyyy</code>. If a value appears <strong>unchanged</strong> in an unusual form, the application judged it implausible and refused to reformat it — for example a misread <code>32.01.2024</code>, or an ISO-style <code>2024-03-05</code>, which is not the day-first format expected on Romanian invoices.</p>
 <h3 id="only-one-or-two-fields-are-found-on-a-good-scan">Only one or two fields are found on a good scan</h3>
@@ -118,7 +129,9 @@
 <h2 id="performance">Performance</h2>
 <p>Recognition normally takes one to three seconds per page.</p>
 <ul>
-<li><strong>Much slower?</strong> Very large images (above ~4000 pixels wide) take longer for no benefit — scan at 300 dpi rather than 1200.</li>
+<li><strong>A page that reads cleanly is read once</strong>, and takes what it always did.</li>
+<li><strong>A page that does not</strong> is read again, up to three more times, with the picture prepared differently — so a difficult scan can take several times as long as an easy one. That is the trade being made: seconds for fields. Set <code>ocr.passes.maximum=1</code> to opt out entirely, or lower <code>ocr.passes.targetConfidence</code> to make the application satisfied sooner. See <a href="Settings.html#how-many-times-a-page-is-read">Settings</a>.</li>
+<li><strong>Much slower still?</strong> Very large images (above ~4000 pixels wide) take longer for no benefit — scan at 300 dpi rather than 1200.</li>
 <li><strong>Using several languages</strong> (<code>ron+eng</code>) is slower than one.</li>
 <li>The <code>tessdata_best</code> language files are noticeably slower than <code>tessdata_fast</code>.</li>
 </ul>

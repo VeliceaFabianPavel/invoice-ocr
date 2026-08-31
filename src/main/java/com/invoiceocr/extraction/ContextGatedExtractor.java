@@ -30,10 +30,10 @@ public final class ContextGatedExtractor implements FieldExtractor {
     }
 
     @Override
-    public Optional<String> extract(SearchText text, TextRegion region) {
+    public Optional<Extraction> extract(SearchText text, TextRegion region) {
         if (!text.matcher(required, text.whole()).find()) {
             return Optional.empty();
         }
-        return delegate.extract(text, region);
+        return delegate.extract(text, region).map(found -> found.via("gated"));
     }
 }

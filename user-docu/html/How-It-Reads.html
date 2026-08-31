@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How It Reads &middot; Invoice OCR Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/wiki.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+<div class="shell">
+<nav class="sidebar" aria-label="Handbook">
+<a class="brand" href="index.html"><span class="brand-name">Invoice OCR</span><span class="brand-tag">User handbook</span></a>
+<div class="search">
+<input type="search" id="q" placeholder="Search the handbook" autocomplete="off" aria-label="Search the handbook">
+<ul id="results" hidden></ul>
+</div>
+<ol class="pages">
+<li><a href="index.html">Home</a></li>
+<li><a href="Installation.html">Installation</a></li>
+<li><a href="Getting-Started.html">Getting Started</a></li>
+<li><a href="The-Main-Window.html">The Main Window</a></li>
+<li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html" aria-current="page">How It Reads</a>
+<ul class="sections">
+<li><a href="#it-reads-the-page-several-times">It reads the page several times</a></li>
+<li><a href="#it-checks-what-it-read">It checks what it read</a></li>
+<li><a href="#it-tells-you-what-to-check">It tells you what to check</a></li>
+<li><a href="#what-it-still-cannot-do">What it still cannot do</a></li>
+</ul>
+</li>
+<li><a href="Exporting.html">Exporting</a></li>
+<li><a href="Preparing-Invoices.html">Preparing Invoices</a></li>
+<li><a href="Settings.html">Settings</a></li>
+<li><a href="Troubleshooting.html">Troubleshooting</a></li>
+<li><a href="FAQ.html">Frequently Asked Questions</a></li>
+<li><a href="Glossary.html">Glossary</a></li>
+</ol>
+</nav>
+<main id="content">
+<article>
+<h1 id="how-it-reads">How It Reads</h1>
+<p>Version 1.2 changed what happens between clicking <strong>Incarca factura</strong> and seeing the right-hand panel. This page explains it, because it changes how much you should trust what comes back — and where to look when something is wrong.</p>
+<p>The short version: the application now reads the page <strong>more than once</strong>, and then <strong>checks</strong> what it read.</p>
+<hr>
+<h2 id="it-reads-the-page-several-times">It reads the page several times</h2>
+<p>Recognising text from an image means making two guesses before you have seen anything: how to prepare the picture, and how the text on it is arranged. Get either wrong and whole fields go missing — not because the application failed to understand them, but because they were never transcribed in the first place.</p>
+<p>So it tries up to four times, each differently:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>Attempt</th><th>What it does to the picture</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td>Enlarges a small scan and converts it to grey — the quickest, and enough for most scans</td></tr>
+<tr><td>2</td><td>Straightens a crooked page, then stretches the contrast</td></tr>
+<tr><td>3</td><td>The above, plus black-and-white conversion that copes with uneven lighting</td></tr>
+<tr><td>4</td><td>Sharpens softened characters and reads the page as one block of text</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>It stops as soon as it is satisfied.</strong> A clean scan is read once and takes exactly as long as it did before. Only a page that leaves something unread or uncertain is worth a second look, and only that page pays for one.</p>
+<p>Then it compares the answers. If two attempts read the same invoice number, that agreement counts for a lot — the mistakes recognition makes depend on how the picture was prepared, so a value that survives two different preparations is very likely right. A modest reading that two attempts agree on beats a confident reading that only one produced.</p>
+<h3 id="what-this-fixes-in-practice">What this fixes in practice</h3>
+<ul>
+<li><strong>Photographs taken by hand.</strong> A page held at three or four degrees used to lose whole lines, because slightly slanted text gets merged with the line above it. It is straightened now.</li>
+<li><strong>A desk lamp on one side.</strong> Half the page in shadow used to come back as a black block. Attempt 3 judges each part of the page against its own surroundings instead of against one fixed brightness.</li>
+<li><strong>Faded thermal receipts.</strong> Attempt 2 stretches what little contrast there is back over the full range.</li>
+</ul>
+<hr>
+<h2 id="it-checks-what-it-read">It checks what it read</h2>
+<p>Some values on an invoice can be <em>verified</em>, not merely recognised. The application now does so, and the difference is large: a check does not just confirm a good reading, it lets a bad one be rejected and the next-best answer used instead.</p>
+<h3 id="the-fiscal-code-has-a-control-digit">The fiscal code has a control digit</h3>
+<p>A Romanian CUI is not an arbitrary number — its last digit is computed from the others. So of two codes printed identically on the same page, the application can tell which one it read correctly, without knowing anything about where either sat.</p>
+<h3 id="the-bank-account-has-a-checksum">The bank account has a checksum</h3>
+<p>Every IBAN does. Here the check is a veto: an account that does not verify is reported as <strong>N/A</strong> rather than shown. An almost-right bank account is worse than no bank account.</p>
+<h3 id="a-date-has-to-exist">A date has to exist</h3>
+<p><code>31.02.2024</code> is a shape, not a day. Previously it would have been printed on the report as fact; now it is refused and the application looks elsewhere on the page.</p>
+<h3 id="the-amounts-have-to-add-up">The amounts have to add up</h3>
+<p>Every invoice obeys one rule: <strong>net + VAT = total</strong>. Three figures read independently are three chances to be wrong. Three figures that must add up are a system that solves itself, and the application uses it four ways:</p>
+<div class="table-wrap">
+<table>
+<thead>
+<tr><th>What it finds</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td>All three, and they add up</td><td>Reports all three as confirmed</td></tr>
+<tr><td>Two of the three</td><td>Works out the third exactly</td></tr>
+<tr><td>All three, but they do not add up</td><td>Recomputes the odd one out from the two that make sense together</td></tr>
+<tr><td>Only the total, with the rate printed beside it</td><td>Recovers the other two</td></tr>
+<tr><td>Nothing that reconciles</td><td>Reports all three as read, and marks them for you to check</td></tr>
+</tbody>
+</table>
+</div>
+<p>It never invents a figure. Every amount it fills in is implied by two amounts that were actually printed on the page.</p>
+<p>This is where most newly-populated fields come from. An invoice that prints only "Total fara TVA" and "Total de plata" now yields a VAT figure it never carried.</p>
+<hr>
+<h2 id="it-tells-you-what-to-check">It tells you what to check</h2>
+<p>Not every value is equally certain, and the application no longer pretends otherwise.</p>
+<p>The status bar says so first:</p>
+<pre><code>factura-03.png: 9 campuri identificate, 2 de verificat</code></pre>
+<p><em>(9 fields recognised, 2 to check.)</em></p>
+<p>And the two are marked in the report with <strong>(?)</strong>:</p>
+<pre><code>Total de plata      : 1190.00 (?)</code></pre>
+<p>A mark means the value was worked out or guessed rather than read from its own label — for instance the largest amount on a page that never labelled a total. It is usually right. It is simply the one worth a glance at the raw panel before you use it.</p>
+<p><strong>When nothing is marked, nothing needs checking</strong>, and the status bar uses the shorter message. That is the point of the mark: it stays meaningful because it is not always there.</p>
+<p>The marks appear in every export that a person reads — PDF, plain text, Markdown and HTML. The data formats carry the same information as numbers instead: see <a href="Exporting.html">Exporting</a>.</p>
+<hr>
+<h2 id="what-it-still-cannot-do">What it still cannot do</h2>
+<ul>
+<li>It cannot read text that is not there. A page too blurred for any of the four attempts is a page that needs rescanning — see <a href="Preparing-Invoices.html">Preparing Invoices</a>.</li>
+<li>The checks are Romanian. A foreign supplier's fiscal code is reported without being confirmed, rather than wrongly rejected.</li>
+<li>The VAT rates it recognises are the ones charged in Romania. An invoice at some other rate still has its amounts read; they simply cannot corroborate one another.</li>
+<li>Straightening handles a tilt, not a rotation. A page scanned sideways needs turning the right way up first.</li>
+</ul>
+<hr>
+<p><strong>See also:</strong> <a href="Extracted-Fields.html">Extracted Fields</a> for what each field means · <a href="Settings.html">Settings</a> to trade speed against accuracy · <a href="Preparing-Invoices.html">Preparing Invoices</a> to give it a better picture</p>
+</article>
+<nav class="pager" aria-label="Pagination">
+<a class="prev" href="Line-Items.html"><span>Previous</span>Line Items</a>
+<a class="next" href="Exporting.html"><span>Next</span>Exporting</a>
+</nav>
+</main>
+</div>
+<script src="assets/wiki-index.js"></script>
+<script src="assets/wiki.js"></script>
+</body>
+</html>

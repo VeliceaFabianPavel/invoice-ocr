@@ -24,6 +24,8 @@
 <li><a href="Getting-Started.html">Getting Started</a></li>
 <li><a href="The-Main-Window.html">The Main Window</a></li>
 <li><a href="Extracted-Fields.html">Extracted Fields</a></li>
+<li><a href="Line-Items.html">Line Items</a></li>
+<li><a href="How-It-Reads.html">How It Reads</a></li>
 <li><a href="Exporting.html" aria-current="page">Exporting</a>
 <ul class="sections">
 <li><a href="#how-to-export">How to export</a></li>
@@ -64,53 +66,88 @@
 <tr><th>Format</th><th>Extension</th><th>Contains</th><th>Best for</th></tr>
 </thead>
 <tbody>
-<tr><td><strong>PDF document</strong></td><td><code>.pdf</code></td><td>Fields and raw text</td><td>Filing, printing, sending to someone</td></tr>
-<tr><td><strong>Plain text</strong></td><td><code>.txt</code></td><td>Fields and raw text</td><td>Pasting into an e-mail or a note</td></tr>
-<tr><td><strong>Markdown</strong></td><td><code>.md</code></td><td>Fields and raw text</td><td>Notes, wikis, issue trackers</td></tr>
-<tr><td><strong>HTML page</strong></td><td><code>.html</code></td><td>Fields and raw text</td><td>Opening in a browser, sharing a link</td></tr>
-<tr><td><strong>JSON data</strong></td><td><code>.json</code></td><td>Fields only</td><td>Importing into another program</td></tr>
-<tr><td><strong>XML data</strong></td><td><code>.xml</code></td><td>Fields only</td><td>Accounting software, data exchange</td></tr>
-<tr><td><strong>CSV spreadsheet</strong></td><td><code>.csv</code></td><td>Fields only</td><td>Excel, LibreOffice, a running ledger</td></tr>
+<tr><td><strong>PDF document</strong></td><td><code>.pdf</code></td><td>Fields, goods table, raw text</td><td>Filing, printing, sending to someone</td></tr>
+<tr><td><strong>Plain text</strong></td><td><code>.txt</code></td><td>Fields, goods table, raw text</td><td>Pasting into an e-mail or a note</td></tr>
+<tr><td><strong>Markdown</strong></td><td><code>.md</code></td><td>Fields, goods table, raw text</td><td>Notes, wikis, issue trackers</td></tr>
+<tr><td><strong>HTML page</strong></td><td><code>.html</code></td><td>Fields, goods table, raw text</td><td>Opening in a browser, sharing a link</td></tr>
+<tr><td><strong>JSON data</strong></td><td><code>.json</code></td><td>Fields, goods table, how sure each value is</td><td>Importing into another program</td></tr>
+<tr><td><strong>XML data</strong></td><td><code>.xml</code></td><td>Fields, goods table, how sure each value is</td><td>Accounting software, data exchange</td></tr>
+<tr><td><strong>CSV spreadsheet</strong></td><td><code>.csv</code></td><td>Fields only, one row per invoice</td><td>Excel, LibreOffice, a running ledger</td></tr>
 </tbody>
 </table>
 </div>
 <p>The split is deliberate:</p>
 <ul>
-<li><strong>Readable formats</strong> — PDF, TXT, Markdown, HTML — carry the six fields <em>and</em> the raw OCR text, because a person reading the file later may need to check what the recognition engine actually saw.</li>
-<li><strong>Data formats</strong> — JSON, XML, CSV — carry the fields alone, because a program reading them wants a clean record and nothing else.</li>
+<li><strong>Readable formats</strong> — PDF, TXT, Markdown, HTML — carry the twelve fields <em>and</em> the raw OCR text, because a person reading the file later may need to check what the recognition engine actually saw. Values that were worked out rather than read carry the same <strong>(?)</strong> mark you see on screen.</li>
+<li><strong>Data formats</strong> — JSON, XML — carry the fields, the table and a number saying how sure the application is of each value, because a program importing them can decide for itself what to accept.</li>
+<li><strong>CSV is the exception</strong>, deliberately: one header row and one value row, so that several exported invoices stack into one spreadsheet. Confidence columns or a variable number of table rows would destroy that, so it has neither.</li>
 </ul>
 <hr>
 <h2 id="what-each-format-looks-like">What each format looks like</h2>
 <h3 id="pdf">PDF</h3>
-<p>An A4 document: the six fields, the count of how many were recognised, and the raw OCR text underneath in a fixed-width font. Long invoices continue onto further pages, each numbered.</p>
+<p>An A4 document: the twelve fields, the goods table, the count of how many fields were recognised, and the raw OCR text underneath in a fixed-width font. Long invoices continue onto further pages, each numbered.</p>
 <p>The text is real text, not a picture, so it can be searched and copied in any PDF reader.</p>
 <blockquote>
 <p><strong>Romanian letters in PDF.</strong> PDF's built-in fonts cannot show <code>ă</code>, <code>ș</code> or <code>ț</code>, so those are written as <code>a</code>, <code>s</code> and <code>t</code> in the PDF <strong>only</strong>. Every other format keeps them exactly as recognised. If the diacritics matter to you, export HTML or TXT instead.</p>
 </blockquote>
 <h3 id="csv">CSV</h3>
 <p>A header row of field names and one row of values:</p>
-<pre><code>supplier,invoiceNumber,issueDate,fiscalCode,vatAmount,totalAmount
-SC EXEMPLU DISTRIBUTIE SRL,FCT-2024/0182,05.03.2024,RO12345678,190.00,1190.00</code></pre>
+<pre><code>supplier,buyer,invoiceNumber,issueDate,dueDate,fiscalCode,registrationNumber,iban,netAmount,vatAmount,totalAmount,currency
+SC EXEMPLU DISTRIBUTIE SRL,,FCT-2024/0182,05.03.2024,,RO12345674,,,1000.00,190.00,1190.00,RON</code></pre>
 <p>Because the header is always the same, several exported invoices stack into one spreadsheet: paste each new row under the last. A field that was not found is an empty cell.</p>
+<p>Version 1.2 added six columns — buyer, due date, register number, IBAN, net amount and currency — and changed nothing else about this format. A sheet built from 1.1 exports needs the six new headers adding; the six original columns are in the same order and mean the same thing.</p>
 <h3 id="json">JSON</h3>
 <pre><code>{
-  "supplier": "SC EXEMPLU DISTRIBUTIE SRL",
-  "invoiceNumber": "FCT-2024/0182",
-  "issueDate": "05.03.2024",
-  "fiscalCode": "RO12345678",
-  "vatAmount": "190.00",
-  "totalAmount": "1190.00"
+  "fields": {
+    "supplier": "SC EXEMPLU DISTRIBUTIE SRL",
+    "invoiceNumber": "FCT-2024/0182",
+    "issueDate": "05.03.2024",
+    "fiscalCode": "RO12345674",
+    "netAmount": "1000.00",
+    "vatAmount": "190.00",
+    "totalAmount": "1190.00",
+    "iban": null
+  },
+  "confidence": {
+    "supplier": 0.90,
+    "vatAmount": 0.70
+  },
+  "lineItems": [
+    {
+      "description": "Ciment Portland",
+      "quantity": "10",
+      "unitPrice": "32.00",
+      "value": "320.00"
+    }
+  ],
+  "summary": {
+    "recognized": 10,
+    "fields": 12,
+    "averageConfidence": 0.87,
+    "needsReview": ["vatAmount"]
+  }
 }</code></pre>
-<p>A field that was not found is <code>null</code>, never a missing key, so the shape of the object is the same every time.</p>
+<p>A field that was not found is <code>null</code>, never a missing key, so the shape of <code>fields</code> is the same every time.</p>
+<p><code>confidence</code> gives each value a number between 0 and 1 saying how sure the application is of it: <code>1.00</code> means it was verified — a checksum that adds up, or an amount confirmed by the other two — and anything under <code>0.60</code> also appears in <code>needsReview</code>. See <a href="How-It-Reads.html">How It Reads</a>.</p>
+<blockquote>
+<p><strong>This shape changed in 1.2.</strong> Version 1.1 put the field keys at the top level of the document. If you have a program reading these files, point it at <code>fields</code> instead of the root object; nothing inside <code>fields</code> changed.</p>
+</blockquote>
 <h3 id="xml">XML</h3>
 <pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;invoice recognized="6" fields="6"&gt;
-  &lt;field key="supplier" found="true"&gt;SC EXEMPLU DISTRIBUTIE SRL&lt;/field&gt;
-  &lt;field key="totalAmount" found="true"&gt;1190.00&lt;/field&gt;
+&lt;invoice recognized="10" fields="12" averageConfidence="0.87"&gt;
+  &lt;field key="supplier" found="true" confidence="1.00"
+         strategy="labelled+checked" review="false"&gt;SC EXEMPLU DISTRIBUTIE SRL&lt;/field&gt;
+  &lt;field key="totalAmount" found="true" confidence="1.00"
+         strategy="arithmetic-confirmed" review="false"&gt;1190.00&lt;/field&gt;
+  &lt;field key="iban" found="false"&gt;&lt;/field&gt;
+  &lt;lineItems count="1"&gt;
+    &lt;item quantity="10" unitPrice="32.00" value="320.00"&gt;Ciment Portland&lt;/item&gt;
+  &lt;/lineItems&gt;
 &lt;/invoice&gt;</code></pre>
-<p>The <code>found</code> attribute distinguishes "not printed on the invoice" from "read as an empty value".</p>
+<p>The <code>found</code> attribute distinguishes "not printed on the invoice" from "read as an empty value". <code>confidence</code> and <code>review</code> say how much to trust the value, and <code>strategy</code> says how it was arrived at.</p>
+<p>Everything 1.2 added here is an extra attribute or an extra element, so a program written against the 1.1 format keeps working unchanged.</p>
 <h3 id="markdown-and-html">Markdown and HTML</h3>
-<p>Both render the fields as a table and the raw OCR text below it. The HTML file is self-contained — the styling is inside the file — so it can be e-mailed or archived on its own and still look right.</p>
+<p>Both render the fields as a table, the goods table beneath it, and the raw OCR text below that. Values that were worked out carry the <strong>(?)</strong> mark, with a note explaining it. The HTML file is self-contained — the styling is inside the file — so it can be e-mailed or archived on its own and still look right; hovering over a value shows how it was found.</p>
 <hr>
 <h2 id="field-names-in-data-formats">Field names in data formats</h2>
 <p>JSON, XML and CSV use fixed English keys, never the translated labels, so a file means the same thing whatever language the interface is set to:</p>
@@ -121,14 +158,21 @@ SC EXEMPLU DISTRIBUTIE SRL,FCT-2024/0182,05.03.2024,RO12345678,190.00,1190.00</c
 </thead>
 <tbody>
 <tr><td>Furnizor</td><td><code>supplier</code></td></tr>
+<tr><td>Cumparator</td><td><code>buyer</code></td></tr>
 <tr><td>Serie / Numar</td><td><code>invoiceNumber</code></td></tr>
 <tr><td>Data emiterii</td><td><code>issueDate</code></td></tr>
+<tr><td>Data scadentei</td><td><code>dueDate</code></td></tr>
 <tr><td>CUI / CIF</td><td><code>fiscalCode</code></td></tr>
+<tr><td>Reg. Comertului</td><td><code>registrationNumber</code></td></tr>
+<tr><td>Cont bancar (IBAN)</td><td><code>iban</code></td></tr>
+<tr><td>Total fara TVA</td><td><code>netAmount</code></td></tr>
 <tr><td>TVA</td><td><code>vatAmount</code></td></tr>
 <tr><td>Total de plata</td><td><code>totalAmount</code></td></tr>
+<tr><td>Moneda</td><td><code>currency</code></td></tr>
 </tbody>
 </table>
 </div>
+<p>The rows of the goods table use <code>description</code>, <code>quantity</code>, <code>unitPrice</code> and <code>value</code> in JSON, and the same names as attributes in XML.</p>
 <hr>
 <h2 id="choosing-which-format-opens-first">Choosing which format opens first</h2>
 <p>The save dialog starts on PDF. To change that, set <a href="Settings.html#default-export-format"><code>export.defaultFormat</code></a> to <code>pdf</code>, <code>txt</code>, <code>md</code>, <code>html</code>, <code>json</code>, <code>xml</code> or <code>csv</code>.</p>
@@ -138,13 +182,14 @@ SC EXEMPLU DISTRIBUTIE SRL,FCT-2024/0182,05.03.2024,RO12345678,190.00,1190.00</c
 <li>Exporting never changes the invoice image, and never alters what is on screen.</li>
 <li>Values are exported exactly as shown in the right-hand panel, already <a href="Extracted-Fields.html#how-values-are-cleaned-up">normalised</a> — amounts as <code>1190.00</code>, dates as <code>05.03.2024</code>.</li>
 <li>Fields shown as <code>N/A</code> are exported as empty (CSV, XML), <code>null</code> (JSON) or <code>N/A</code> (readable formats).</li>
+<li>Table columns the invoice did not print behave the same way, so an absent quantity is <code>null</code> rather than <code>0</code>.</li>
 <li>If writing fails — a full disk, a read-only folder, a disconnected network drive — an existing file of the same name is left untouched. See <a href="Troubleshooting.html#could-not-write-the-file">Troubleshooting</a>.</li>
 </ul>
 <hr>
 <p><strong>See also:</strong> <a href="The-Main-Window.html">The Main Window</a> · <a href="Extracted-Fields.html">Extracted Fields</a> · <a href="Settings.html">Settings</a></p>
 </article>
 <nav class="pager" aria-label="Pagination">
-<a class="prev" href="Extracted-Fields.html"><span>Previous</span>Extracted Fields</a>
+<a class="prev" href="How-It-Reads.html"><span>Previous</span>How It Reads</a>
 <a class="next" href="Preparing-Invoices.html"><span>Next</span>Preparing Invoices</a>
 </nav>
 </main>

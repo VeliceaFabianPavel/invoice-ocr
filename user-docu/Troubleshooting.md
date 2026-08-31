@@ -193,6 +193,41 @@ something else, or an amount was misread. Check the raw panel: if it shows
 `1.190,00`, the extraction is right; if it shows `1.19O,00` (letter O for zero),
 it is a recognition problem and a better scan fixes it.
 
+Since version 1.2 the three amounts have to satisfy **net + VAT = total**, so a
+single misread figure is usually corrected for you from the other two. If all
+three are marked **(?)**, none of them could be reconciled — which is a strong
+hint that more than one was misread, and that the scan is the problem.
+
+### A value is marked (?)
+
+That is the application telling you it worked the value out rather than reading
+it from its own label. It is not an error. Compare it with the left panel; if it
+is right, use it. See [How It Reads](How-It-Reads.md#it-tells-you-what-to-check).
+
+### The bank account is N/A but the invoice shows one
+
+Every IBAN carries a checksum, and the application refuses to report an account
+that fails it — an almost-right bank account is worse than none. Look at the raw
+panel: the account is usually there with one character misread, and a better scan
+fixes it.
+
+### The fiscal code is marked (?)
+
+Romanian fiscal codes have a control digit, and this one did not add up. Either
+recognition misread a digit — check the raw panel — or the code genuinely is a
+foreign one, which this check does not apply to. The value is still shown,
+because it is usually right.
+
+### The product rows are missing
+
+The goods table needs a heading row carrying both a description column
+(`Denumire`, `Produs`, `Nr. crt`) and a figure column (`Cant`, `Pret`,
+`Valoare`). Without one the application reports no rows rather than guessing at
+them. Check the raw panel: if the heading is garbled, a better scan fixes it; if
+your invoices use headings the application does not know, the rows will stay
+missing while the header fields are read normally. See
+[Line Items](Line-Items.md).
+
 ### The date looks odd
 
 Dates are shown as `dd.MM.yyyy`. If a value appears **unchanged** in an unusual
@@ -211,8 +246,15 @@ bottom. A cut-off footer is the classic cause.
 
 Recognition normally takes one to three seconds per page.
 
-- **Much slower?** Very large images (above ~4000 pixels wide) take longer for no
-  benefit — scan at 300 dpi rather than 1200.
+- **A page that reads cleanly is read once**, and takes what it always did.
+- **A page that does not** is read again, up to three more times, with the
+  picture prepared differently — so a difficult scan can take several times as
+  long as an easy one. That is the trade being made: seconds for fields. Set
+  `ocr.passes.maximum=1` to opt out entirely, or lower
+  `ocr.passes.targetConfidence` to make the application satisfied sooner. See
+  [Settings](Settings.md#how-many-times-a-page-is-read).
+- **Much slower still?** Very large images (above ~4000 pixels wide) take longer
+  for no benefit — scan at 300 dpi rather than 1200.
 - **Using several languages** (`ron+eng`) is slower than one.
 - The `tessdata_best` language files are noticeably slower than `tessdata_fast`.
 

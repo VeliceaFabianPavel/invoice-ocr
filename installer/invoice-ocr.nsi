@@ -29,7 +29,7 @@ Unicode true
 ;------------------------------------------------------------------ definitions
 
 !define APP_NAME        "Invoice OCR"
-!define APP_VERSION     "1.1.1"
+!define APP_VERSION     "1.2.0"
 !define APP_PUBLISHER   "Invoice OCR"
 !define APP_URL         "https://github.com/tesseract-ocr/tesseract"
 !define APP_JAR_NAME    "invoice-ocr.jar"
@@ -439,13 +439,33 @@ Section "-Finalize"
     StrCpy $2 "ron+eng"
   ${EndIf}
 
+  ; Only the settings this machine actually needs are written live. The rest are
+  ; listed commented-out: it makes them discoverable in the file the user is told
+  ; to edit, while leaving the defaults where they belong - in the jar - so a
+  ; later release can change one without every installed machine overriding it.
   FileOpen $0 "$INSTDIR\invoice-ocr.properties" w
-  FileWrite $0 "# ${APP_NAME} settings, written by the installer.$\r$\n"
+  FileWrite $0 "# ${APP_NAME} ${APP_VERSION} settings, written by the installer.$\r$\n"
   FileWrite $0 "# Use forward slashes in paths. Restart the application after editing.$\r$\n"
   FileWrite $0 "$\r$\n"
   FileWrite $0 "ocr.tessdata.path=$1$\r$\n"
   FileWrite $0 "ocr.language=$2$\r$\n"
   FileWrite $0 "ui.locale=ro$\r$\n"
+  FileWrite $0 "$\r$\n"
+  FileWrite $0 "# --- reading (1.2.0) ------------------------------------------------$\r$\n"
+  FileWrite $0 "# A page is read up to this many times, each with the picture prepared$\r$\n"
+  FileWrite $0 "# differently, and the answers compared. Reading stops as soon as one is$\r$\n"
+  FileWrite $0 "# good enough, so a clean scan still costs a single pass.$\r$\n"
+  FileWrite $0 "#   1 = one reading, exactly as version 1.1 behaved$\r$\n"
+  FileWrite $0 "#ocr.passes.maximum=4$\r$\n"
+  FileWrite $0 "#ocr.passes.targetConfidence=0.80$\r$\n"
+  FileWrite $0 "$\r$\n"
+  FileWrite $0 "# Read the rows of the goods table, and mark values that were worked$\r$\n"
+  FileWrite $0 "# out rather than read from their own label.$\r$\n"
+  FileWrite $0 "#extraction.lineItems.enabled=true$\r$\n"
+  FileWrite $0 "#report.showConfidence=true$\r$\n"
+  FileWrite $0 "#report.lineItems=true$\r$\n"
+  FileWrite $0 "$\r$\n"
+  FileWrite $0 "# Every setting is documented in docs\index.html -> Settings.$\r$\n"
   FileClose $0
   DetailPrint "Language data: $TessdataDir (ocr.language=$2)"
 

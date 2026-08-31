@@ -1,5 +1,6 @@
 package com.invoiceocr.extraction;
 
+import com.invoiceocr.domain.FieldConfidence;
 import com.invoiceocr.extraction.text.SearchText;
 import com.invoiceocr.extraction.text.TextRegion;
 import java.util.Objects;
@@ -19,6 +20,7 @@ public final class RegexFieldExtractor implements FieldExtractor {
     private static final int DEFAULT_FLAGS =
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.MULTILINE;
     private static final int DEFAULT_GROUP = 1;
+    private static final String NAME = "regex";
 
     private final Pattern pattern;
     private final int group;
@@ -37,14 +39,16 @@ public final class RegexFieldExtractor implements FieldExtractor {
     }
 
     @Override
-    public Optional<String> extract(SearchText text, TextRegion region) {
+    public Optional<Extraction> extract(SearchText text, TextRegion region) {
         Objects.requireNonNull(text, "text");
         Matcher matcher = text.matcher(pattern, region);
         if (!matcher.find() || matcher.groupCount() < group || matcher.start(group) < 0) {
             return Optional.empty();
         }
         String value = text.slice(matcher.start(group), matcher.end(group));
-        return value.isBlank() ? Optional.empty() : Optional.of(value);
+        return value.isBlank()
+                ? Optional.empty()
+                : Optional.of(Extraction.of(value, FieldConfidence.LABELLED, NAME));
     }
 
     @Override

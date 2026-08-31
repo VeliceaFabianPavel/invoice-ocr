@@ -2,6 +2,7 @@ package com.invoiceocr.export;
 
 import com.invoiceocr.domain.ExtractedField;
 import com.invoiceocr.domain.InvoiceData;
+import com.invoiceocr.domain.LineItem;
 import com.invoiceocr.i18n.MessageKeys;
 import com.invoiceocr.i18n.MessageSource;
 import java.io.ByteArrayOutputStream;
@@ -45,6 +46,11 @@ public final class PdfInvoiceExporter implements InvoiceExporter {
 
     private static final Charset WIN_ANSI = Charset.forName("windows-1252");
 
+    /** Goods-table column widths, in characters of the monospaced font. */
+    private static final int ITEM_DESCRIPTION_COLUMN = 24;
+    private static final int ITEM_DESCRIPTION_LIMIT = 42;
+    private static final int ITEM_NUMBER_COLUMN = 12;
+
     private final MessageSource messages;
 
     public PdfInvoiceExporter(MessageSource messages) {
@@ -73,14 +79,33 @@ public final class PdfInvoiceExporter implements InvoiceExporter {
         lines.add(new Line(FONT_BOLD, 18f, 0f, messages.get(MessageKeys.REPORT_HEADER), 30f));
 
         String missing = messages.get(MessageKeys.REPORT_MISSING_VALUE);
+        String mark = messages.get(MessageKeys.REPORT_REVIEW_MARK);
+        boolean anyMarked = false;
         for (ExtractedField field : data.fields()) {
             String label = messages.get(field.definition().labelKey());
+            String value = field.valueOr(missing);
+            if (field.needsReview()) {
+                value = value + " " + mark;
+                anyMarked = true;
+            }
             lines.add(new Line(FONT_BOLD, 11f, 0f, label, 0f));
-            lines.add(new Line(FONT_REGULAR, 11f, 170f, field.valueOr(missing), 20f));
+            lines.add(new Line(FONT_REGULAR, 11f, 170f, value, 20f));
         }
 
         lines.add(new Line(FONT_REGULAR, 10f, 0f,
-                messages.get(MessageKeys.REPORT_FOOTER, data.recognizedCount(), data.fields().size()), 26f));
+                messages.get(MessageKeys.REPORT_FOOTER, data.recognizedCount(), data.fields().size()),
+                anyMarked ? 16f : 26f));
+
+        if (anyMarked) {
+            for (String hint : messages.get(MessageKeys.REPORT_REVIEW_HINT).split("\r?\n", -1)) {
+                lines.add(new Line(FONT_REGULAR, 9f, 0f, hint, 12f));
+            }
+            lines.add(new Line(FONT_REGULAR, 9f, 0f, "", 12f));
+        }
+
+        if (data.hasLineItems()) {
+            layoutLineItems(data, lines, missing);
+        }
 
         if (!data.source().isBlank()) {
             lines.add(new Line(FONT_BOLD, 12f, 0f, messages.get(MessageKeys.REPORT_RAW_TEXT), 18f));
@@ -91,6 +116,56 @@ public final class PdfInvoiceExporter implements InvoiceExporter {
             }
         }
         return lines;
+    }
+
+    /**
+     * The goods table, set in the monospaced font.
+     *
+     * <p>Columns are aligned by padding rather than by placing each cell, which
+     * only works because the font is fixed-width — but it works exactly, and it
+     * keeps the writer free of the text-measurement machinery a proportional
+     * table would need.</p>
+     */
+    private void layoutLineItems(InvoiceData data, List<Line> lines, String missing) {
+        lines.add(new Line(FONT_BOLD, 12f, 0f, messages.get(MessageKeys.REPORT_ITEMS_TITLE), 18f));
+
+        int width = Math.max(ITEM_DESCRIPTION_COLUMN, data.lineItems().stream()
+                .mapToInt(item -> item.description().length())
+                .max()
+                .orElse(0));
+        width = Math.min(width, ITEM_DESCRIPTION_LIMIT);
+
+        lines.add(new Line(FONT_MONO, 9f, 0f, itemRow(width,
+                messages.get(MessageKeys.REPORT_ITEMS_DESCRIPTION),
+                messages.get(MessageKeys.REPORT_ITEMS_QUANTITY),
+                messages.get(MessageKeys.REPORT_ITEMS_UNIT_PRICE),
+                messages.get(MessageKeys.REPORT_ITEMS_TOTAL)), 13f));
+
+        for (LineItem item : data.lineItems()) {
+            lines.add(new Line(FONT_MONO, 9f, 0f, itemRow(width,
+                    item.description(),
+                    item.quantityOr(missing),
+                    item.unitPriceOr(missing),
+                    item.lineTotal()), 12f));
+        }
+        lines.add(new Line(FONT_REGULAR, 9f, 0f, "", 14f));
+    }
+
+    private static String itemRow(int width, String description, String quantity,
+                                  String unitPrice, String total) {
+        String name = description.length() > width ? description.substring(0, width) : description;
+        return padRight(name, width)
+                + padLeft(quantity, ITEM_NUMBER_COLUMN)
+                + padLeft(unitPrice, ITEM_NUMBER_COLUMN)
+                + padLeft(total, ITEM_NUMBER_COLUMN);
+    }
+
+    private static String padRight(String value, int width) {
+        return value.length() >= width ? value : value + " ".repeat(width - value.length());
+    }
+
+    private static String padLeft(String value, int width) {
+        return value.length() >= width ? " " + value : " ".repeat(width - value.length()) + value;
     }
 
     /** Hard-wraps a line at a column count; the mono font makes this exact. */

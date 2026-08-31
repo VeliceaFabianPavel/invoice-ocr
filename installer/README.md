@@ -5,7 +5,7 @@ the Tesseract OCR engine in place.
 
 | | [`invoice-ocr.nsi`](invoice-ocr.nsi) | [`Install-InvoiceOCR.ps1`](Install-InvoiceOCR.ps1) |
 |---|---|---|
-| Produces | one `invoice-ocr-setup-1.1.1.exe` to hand out | nothing — it installs directly |
+| Produces | one `invoice-ocr-setup-1.2.0.exe` to hand out | nothing — it installs directly |
 | Needs to build | NSIS 3.x | nothing |
 | Best for | shipping to other people | installing here and now, or from a script |
 
@@ -37,7 +37,7 @@ the missing ingredient instead of erroring inside NSIS:
 
 NSIS itself: `winget install NSIS.NSIS`.
 
-The result is `invoice-ocr-setup-1.1.1.exe` in this folder.
+The result is `invoice-ocr-setup-1.2.0.exe` in this folder.
 
 ---
 
@@ -108,12 +108,25 @@ the language data has to come from somewhere.
 ocr.tessdata.path=C:/Program Files/Tesseract-OCR/tessdata
 ocr.language=ron+eng
 ui.locale=ro
+
+# --- reading (1.2.0) ------------------------------------------------
+#ocr.passes.maximum=4
+#ocr.passes.targetConfidence=0.80
+#extraction.lineItems.enabled=true
+#report.showConfidence=true
+#report.lineItems=true
 ```
 
 `ocr.language` becomes `ron+eng` when Romanian data is present, `eng` otherwise.
 Paths are written with **forward slashes** on purpose: a `.properties` file
 reads a backslash as an escape character, so `C:\Program Files\...` would be
 silently mangled.
+
+**Only the machine-specific settings are written live.** The rest are listed
+commented-out, with a sentence each explaining them. That makes them
+discoverable in the file the user is actually told to edit, while leaving the
+defaults where they belong — in the jar — so a later release can change one
+without every installed machine silently overriding it.
 
 An existing settings file is kept as `invoice-ocr.properties.bak`.
 
@@ -132,8 +145,8 @@ tells you where to find it.
 ## Silent and unattended use
 
 ```powershell
-invoice-ocr-setup-1.1.1.exe /S                                    # silent install
-invoice-ocr-setup-1.1.1.exe /S /D=C:\Apps\InvoiceOCR              # /D must come last, unquoted
+invoice-ocr-setup-1.2.0.exe /S                                    # silent install
+invoice-ocr-setup-1.2.0.exe /S /D=C:\Apps\InvoiceOCR              # /D must come last, unquoted
 "C:\Program Files\Invoice OCR\uninstall.exe" /S                   # silent uninstall
 ```
 

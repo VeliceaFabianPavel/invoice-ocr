@@ -23,7 +23,7 @@ class FirstMatchFieldExtractorTest {
                 "Total de plata\\s*([0-9,.]+)",
                 "Total\\s*([0-9,.]+)");
 
-        assertEquals(Optional.of("119,00"), extractor.extract(TEXT));
+        assertEquals(Optional.of("119,00"), extractor.extractValue(TEXT));
     }
 
     @Test
@@ -31,7 +31,7 @@ class FirstMatchFieldExtractorTest {
     void demonstratesWhyOrderingMatters() {
         FieldExtractor naive = RegexFieldExtractor.of("(?:Total de plata|Total)\\s*([0-9,.]+)");
 
-        assertEquals(Optional.of("100,00"), naive.extract(TEXT));
+        assertEquals(Optional.of("100,00"), naive.extractValue(TEXT));
     }
 
     @Test
@@ -39,6 +39,6 @@ class FirstMatchFieldExtractorTest {
     void returnsEmptyWithoutMatch() {
         FieldExtractor extractor = FirstMatchFieldExtractor.ofPatterns("Discount\\s*([0-9]+)");
 
-        assertTrue(extractor.extract(TEXT).isEmpty());
+        assertTrue(extractor.extractValue(TEXT).isEmpty());
     }
 }
